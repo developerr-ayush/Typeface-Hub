@@ -278,7 +278,7 @@ export function TokenEditor({ ws, origin, canEdit, themes, theme, initial, saved
                     textTransform: s.transform,
                   }}
                 >
-                  {name === 'body' || name === 'caption' ? 'Fans packed the stands as the final over began.' : name === 'button' ? 'Buy tickets' : name === 'label' ? 'Match centre' : 'Southern Brave win by 7 runs'}
+                  The quick brown fox jumps over the lazy dog
                 </div>
                 <fieldset disabled={!canEdit} className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4 lg:grid-cols-[64px_minmax(96px,1fr)_76px_96px_68px_68px_68px_64px_76px_minmax(104px,1fr)_auto]">
                   <legend className="sr-only">{name}</legend>

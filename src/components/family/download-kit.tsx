@@ -161,7 +161,7 @@ export function DownloadKit({ data, version }: { data: FamilyViewData; version: 
                   </span>
                 </label>
               ))}
-              {characters === 'custom' && <Input aria-label="Characters to keep" placeholder="SOUTHERN BRAVE 0123456789" value={customText} onChange={(e) => setCustomText(e.target.value)} className="mt-1" />}
+              {characters === 'custom' && <Input aria-label="Characters to keep" placeholder="THE QUICK BROWN FOX 0123456789" value={customText} onChange={(e) => setCustomText(e.target.value)} className="mt-1" />}
             </div>
           </fieldset>
 

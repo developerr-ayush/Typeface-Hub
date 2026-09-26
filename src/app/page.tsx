@@ -24,6 +24,9 @@ export default async function Home() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
         <Logo />
         <nav className="flex items-center gap-2 text-sm">
+          <Link href="/convert" className="rounded-lg px-3 py-2 font-medium text-ink-2 hover:bg-black/5">
+            Free converter
+          </Link>
           <Link href="/login" className="rounded-lg px-3 py-2 font-medium text-ink-2 hover:bg-black/5">
             Sign in
           </Link>
@@ -45,8 +48,8 @@ export default async function Home() {
             <Link href="/signup" className="rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-accent-strong">
               Create a workspace
             </Link>
-            <Link href="/login" className="rounded-lg border border-line-strong px-5 py-3 text-sm font-semibold text-ink hover:bg-canvas">
-              Sign in
+            <Link href="/convert" className="rounded-lg border border-line-strong px-5 py-3 text-sm font-semibold text-ink hover:bg-canvas">
+              Try the free converter
             </Link>
           </div>
           <div className="mt-14 overflow-hidden rounded-2xl border border-line bg-[#0f1117] shadow-xl">

@@ -123,7 +123,7 @@ export function selectFaces(faces: FaceWithFiles[], req: FamilyRequest): { selec
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const distance = (f: Face, w: number) => (w < f.weightMin ? f.weightMin - w : w > f.weightMax ? w - f.weightMax : 0);
+const distance = (f: Pick<Face, 'weightMin' | 'weightMax'>, w: number) => (w < f.weightMin ? f.weightMin - w : w > f.weightMax ? w - f.weightMax : 0);
 
 /* ------------------------------------------------------------------ */
 /* CSS generation (DLV-2, VAR-5, DLV-9)                               */
@@ -190,7 +190,7 @@ export function fontFaceRules(
 }
 
 /** Metric-adjusted local fallback face so text doesn't shift when the web font swaps in. */
-export function fallbackRule(familyName: string, faces: Face[]) {
+export function fallbackRule(familyName: string, faces: Pick<Face, 'style' | 'weightMin' | 'weightMax' | 'metrics'>[]) {
   const regular =
     [...faces].sort((a, b) => Number(a.style !== 'normal') - Number(b.style !== 'normal') || distance(a, 400) - distance(b, 400))[0];
   const m = regular?.metrics;

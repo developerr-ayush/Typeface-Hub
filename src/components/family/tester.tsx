@@ -32,7 +32,7 @@ export function TesterPanel({ family, version }: { family: FamilyViewData['famil
   const wMax = Math.max(...version.faces.map((f) => f.weightMax));
   const instances = variable?.namedInstances.filter((n) => n.coords.wght !== undefined) ?? [];
 
-  const [text, setText] = useState('Southern Brave clinch it in the final over');
+  const [text, setText] = useState('The quick brown fox jumps over the lazy dog');
   const [size, setSize] = useState(48);
   const [weight, setWeight] = useState(Math.min(Math.max(400, wMin), wMax));
   const [italic, setItalic] = useState(false);

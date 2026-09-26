@@ -303,3 +303,10 @@ export const cssStats = pgTable(
   },
   (t) => [primaryKey({ columns: [t.workspaceId, t.day] })],
 );
+
+// Fixed-window rate limits for public endpoints (the free converter).
+export const rateLimits = pgTable('rate_limits', {
+  key: text('key').primaryKey(), // e.g. "convert:ip:1.2.3.4:2026-09-26T10"
+  count: integer('count').notNull().default(0),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});

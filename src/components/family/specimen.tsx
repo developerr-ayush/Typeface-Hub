@@ -10,7 +10,7 @@ const LOWER = 'abcdefghijklmnopqrstuvwxyz';
 const NUMERALS = '0123456789';
 const PUNCT = '! ? . , : ; … – — ( ) [ ] { } / \\ @ # $ % & * + = < > " \' ‘ ’ “ ” « » € £ ₹ ¥ ©';
 const PARAGRAPH =
-  'Typography is the craft of endowing human language with a durable visual form. A well-set page invites reading: the rhythm of lines, the colour of the text block and the space around letters all matter. Game day at the ground — 42,618 fans, 3 wickets in the final over, and a 7-run win.';
+  'Typography is the craft of endowing human language with a durable visual form. A well-set page invites reading: the rhythm of lines, the colour of the text block and the space around letters all matter. The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs — 0123456789.';
 
 const SCRIPT_SAMPLES: Record<string, string> = {
   latin: 'Hamburgefonstiv',

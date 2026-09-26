@@ -5,6 +5,7 @@ import { getApiActor } from '@/lib/context';
 import { db, schema } from '@/lib/db';
 import { getFamily, usageByFamily } from '@/lib/families';
 import { badRequest, handler, notFound, readJson } from '@/lib/http';
+import { KitOptionsSchema } from '@/lib/convert-options';
 import { buildKit } from '@/lib/kit';
 import { tokensToCss } from '@/lib/tokens';
 import { familyLookup, getTokenSet } from '@/lib/typography';
@@ -12,19 +13,9 @@ import { familyLookup, getTokenSet } from '@/lib/typography';
 export const maxDuration = 300;
 type Ctx = { params: Promise<{ id: string }> };
 
-const Body = z.object({
+const Body = KitOptionsSchema.extend({
   versionId: z.string().uuid().optional(),
-  formats: z.array(z.enum(['woff2', 'woff', 'sfnt'])).min(1).default(['woff2', 'woff']),
   faceIds: z.array(z.string().uuid()).optional(),
-  characters: z.enum(['full', 'split', 'latin', 'latin-ext', 'custom']).default('latin-ext'),
-  customText: z.string().max(2000).optional(),
-  variable: z.enum(['variable', 'static']).default('variable'),
-  staticWeights: z.array(z.number().int().min(1).max(1000)).max(20).optional(),
-  pathPrefix: z.string().max(200).regex(/^[\w./-]*$/, 'Use a relative or absolute path such as ../fonts/').default('../fonts/'),
-  display: z.enum(['auto', 'block', 'swap', 'fallback', 'optional']).default('swap'),
-  fallback: z.boolean().default(true),
-  unicodeRange: z.boolean().default(true),
-  demo: z.boolean().default(true),
   tokens: z.boolean().default(false),
 });
 
