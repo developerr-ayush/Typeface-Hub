@@ -27,5 +27,5 @@ COPY --from=build /app/next.config.ts ./next.config.ts
 RUN mkdir -p /app/.data && chown -R node:node /app/.data
 USER node
 EXPOSE 3000
-# Apply database migrations, then start the server.
-CMD ["sh", "-c", "node scripts/migrate.mjs && exec node_modules/.bin/next start"]
+# Migrations, a generated AUTH_SECRET if none is set, then the server.
+CMD ["node", "scripts/start.mjs"]

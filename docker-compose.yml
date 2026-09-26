@@ -23,7 +23,11 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgres://typeface:typeface@db:5432/typeface_hub
-      AUTH_SECRET: ${AUTH_SECRET:-local-docker-secret-change-me-please-32chars}
+      # Leave empty to have a random secret generated and kept in the font-files volume.
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      # Email for password resets (optional; without it reset links go to `docker compose logs app`).
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
       NEXT_PUBLIC_APP_URL: ${APP_URL:-http://localhost:3000}
       GOOGLE_FONTS_API_KEY: ${GOOGLE_FONTS_API_KEY:-}
     ports:

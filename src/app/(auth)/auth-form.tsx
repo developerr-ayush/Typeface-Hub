@@ -41,7 +41,18 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
         <Field label="Your name">{(id) => <Input id={id} name="name" autoComplete="name" required />}</Field>
       )}
       <Field label="Email">{(id) => <Input id={id} name="email" type="email" autoComplete="email" required />}</Field>
-      <Field label="Password" hint={mode === 'signup' ? 'At least 8 characters.' : undefined}>
+      <Field
+        label="Password"
+        hint={
+          mode === 'signup' ? (
+            'At least 8 characters.'
+          ) : (
+            <Link href="/forgot-password" className="font-medium text-accent hover:underline">
+              Forgot your password?
+            </Link>
+          )
+        }
+      >
         {(id) => <Input id={id} name="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'signup' ? 8 : undefined} required />}
       </Field>
       {mode === 'signup' && (

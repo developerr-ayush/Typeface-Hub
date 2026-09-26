@@ -13,7 +13,7 @@ const Json = z.object({ files: z.array(z.object({ url: z.string().url(), filenam
  * variable, axes) before converting. Files are read in memory and not kept.
  */
 export const POST = handler(async (req) => {
-  await rateLimit(req, 'convert-inspect', CONVERT_LIMITS.perHour * 4, 3600);
+  await rateLimit(req, { name: 'convert-inspect', perIp: CONVERT_LIMITS.perHour * 4, windowSeconds: 3600, global: CONVERT_LIMITS.perHour * 400, message: 'Too many requests from your network.' });
   let inputs: ConvertInput[];
   if ((req.headers.get('content-type') ?? '').includes('multipart/form-data')) {
     const form = await req.formData().catch(() => {

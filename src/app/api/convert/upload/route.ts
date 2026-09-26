@@ -10,7 +10,7 @@ export const POST = handler(async (req) => {
     request: req,
     body,
     onBeforeGenerateToken: async (pathname) => {
-      await rateLimit(req, 'convert-upload', CONVERT_LIMITS.perHour * CONVERT_LIMITS.maxFiles, 3600);
+      await rateLimit(req, { name: 'convert-upload', perIp: CONVERT_LIMITS.perHour * CONVERT_LIMITS.maxFiles, windowSeconds: 3600, global: CONVERT_LIMITS.perHour * CONVERT_LIMITS.maxFiles * 100, message: 'Too many uploads from your network.' });
       if (!pathname.startsWith('convert/')) throw badRequest('Invalid upload path.');
       return { maximumSizeInBytes: CONVERT_LIMITS.maxFileBytes, addRandomSuffix: true, validUntil: Date.now() + 10 * 60_000 };
     },

@@ -113,6 +113,9 @@ export function Shell({
         <div className="truncate text-xs text-muted">
           {user.email} · {role}
         </div>
+        <Link href="/account" className="mt-2 mr-3 inline-block text-xs font-medium text-muted hover:text-ink">
+          Account
+        </Link>
         <button
           type="button"
           className="mt-2 text-xs font-medium text-muted hover:text-ink"

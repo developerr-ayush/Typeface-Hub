@@ -19,6 +19,10 @@ In the project, open **Storage → Create Database** and choose **Neon (Postgres
 
 Open **Storage → Create → Blob**, choose **public** access, and connect it to the project. This sets `BLOB_READ_WRITE_TOKEN`. Uploads then go straight from the browser to Blob, so Vercel's 4.5 MB request limit does not apply.
 
+### Keep original font files private (recommended)
+
+Create a **second** Blob store with **private** access. When connecting it to the project, set the environment variable prefix to `BLOB_PRIVATE` so its token is added as `BLOB_PRIVATE_READ_WRITE_TOKEN` and doesn't replace the first store's token. Original uploads and cached kits are stored there and can't be downloaded by URL. The public store keeps serving the optimised delivery files.
+
 ## 4. Set the session secret
 
 Under **Settings → Environment Variables**, add `AUTH_SECRET` with a long random value:
@@ -28,6 +32,10 @@ openssl rand -base64 32
 ```
 
 > **Important** Without `AUTH_SECRET`, sign-in fails in production.
+
+## Optional: email for password resets
+
+Create a [Resend](https://resend.com) account, verify your sending domain, and add `RESEND_API_KEY` and `EMAIL_FROM` (for example `Typeface Hub <fonts@example.com>`). Without them, reset links only appear in the function logs.
 
 ## 5. Deploy
 

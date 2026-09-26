@@ -37,8 +37,9 @@ export async function GET(req: Request, { params }: Ctx) {
   try {
     const url = new URL(req.url);
     const { families, display } = parseCssQuery(url.searchParams);
-    names = families.map((f) => f.name);
-    const loaded = await loadPublishedFamilies(workspace.id, names);
+    const loaded = await loadPublishedFamilies(workspace.id, families.map((f) => f.name));
+    // Only count families that exist, so junk requests can't grow the stats.
+    names = families.map((f) => f.name).filter((n) => loaded.has(n.toLowerCase()));
     const subsets = url.searchParams.get('subset')?.split(',').filter(Boolean);
     const built = buildStylesheet(families, loaded, {
       display,

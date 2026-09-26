@@ -34,7 +34,7 @@ const isConvertBlob = (url: string) => {
  * Accepts multipart form data (files + options JSON) or JSON with Blob URLs.
  */
 export const POST = handler(async (req) => {
-  await rateLimit(req, 'convert', CONVERT_LIMITS.perHour, 3600);
+  await rateLimit(req, { name: 'convert', perIp: CONVERT_LIMITS.perHour, windowSeconds: 3600, global: CONVERT_LIMITS.perHour * 100, message: 'Too many conversions from your network.' });
 
   let inputs: ConvertInput[] = [];
   let options: z.infer<typeof KitOptionsSchema>;

@@ -28,13 +28,19 @@ What you get:
 | `docker compose down -v` | Stop and **delete** the database and font files |
 | `docker compose up db` | Run only Postgres (for `npm run dev`) |
 
+A random `AUTH_SECRET` is generated on first start and kept in the `font-files` volume, so there's nothing to configure. Password-reset links are written to the log (`docker compose logs app`) unless you set up email.
+
 To change settings, create a `.env` file next to `docker-compose.yml`:
 
 ```bash
-AUTH_SECRET=a-long-random-string
+AUTH_SECRET=optional-long-random-string
+RESEND_API_KEY=optional
+EMAIL_FROM=Typeface Hub <fonts@example.com>
 GOOGLE_FONTS_API_KEY=optional
 APP_URL=http://localhost:3000
 ```
+
+If you put the app on a public server, run it behind a reverse proxy (nginx, Caddy) with HTTPS. Rate limits use the client address that the proxy adds to `X-Forwarded-For`.
 
 ## With Node and Postgres
 
@@ -61,6 +67,7 @@ DATABASE_URL=postgres://typeface:typeface@localhost:5432/typeface_hub
 | --- | --- |
 | `npm run dev` | Development server with hot reload |
 | `npm test` | Unit tests (Vitest) |
+| `npm run test:e2e` | Browser tests (Playwright); needs a build and `DATABASE_URL` |
 | `npm run lint` | TypeScript type-check |
 | `npm run build` | Run migrations, then a production build |
 | `npm run db:generate` | Create a migration after editing `src/lib/db/schema.ts` |

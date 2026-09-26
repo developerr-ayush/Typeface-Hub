@@ -42,6 +42,12 @@ Admins create keys in **Developers → API keys**. Each key belongs to one works
 
 The full key is shown once when it is created. Keys can be revoked at any time.
 
+## Your account
+
+Open **Account** at the bottom of the sidebar to change your name or password. Changing the password signs you out on your other devices. If you forget it, use **Forgot your password?** on the sign-in page.
+
+Sign-in is rate limited: 10 failed attempts for one account, or 20 from one network, within 15 minutes pauses sign-in for that account or network.
+
 ## Audit log
 
 **Activity** lists who uploaded, changed, published, rolled back, archived or deleted what, and when, including actions taken with API keys and by the processing pipeline. Each family's **Activity** tab shows its own history.

@@ -75,6 +75,7 @@ Other scripts:
 
 ```bash
 npm test                    # unit tests (Vitest)
+npm run test:e2e            # browser tests (Playwright; needs npm run build and DATABASE_URL)
 npm run lint                # TypeScript type-check
 npm run build               # migrate + production build
 npm run db:generate         # new SQL migration after editing src/lib/db/schema.ts

@@ -3,8 +3,10 @@ on:
   push:
     branches: [main]
   pull_request:
+
 jobs:
   check:
+    name: Types and unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,3 +17,40 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: typeface
+          POSTGRES_PASSWORD: typeface
+          POSTGRES_DB: typeface_hub
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U typeface -d typeface_hub"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      DATABASE_URL: postgres://typeface:typeface@localhost:5432/typeface_hub
+      AUTH_SECRET: ci-only-secret-that-is-long-enough-0123456789abcdef
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build # also applies migrations
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results
+          retention-days: 7

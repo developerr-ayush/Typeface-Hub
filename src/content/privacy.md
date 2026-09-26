@@ -10,7 +10,9 @@ updated: 26 September 2026
 
 ## What we collect
 
-**Accounts.** Your name, email address and a hashed password (bcrypt). We never store your password in plain text.
+**Accounts.** Your name, email address and a hashed password (bcrypt). We never store your password in plain text. Password-reset links are single-use, expire after an hour, and are stored only as a hash.
+
+**Security limits.** To slow down password guessing and abuse, sign-in, sign-up, password reset and the converter keep short-lived counters keyed by a one-way hash of your network address (and, for sign-in, of the email being used). They expire within the hour.
 
 **Workspace content.** The fonts you upload, the files generated from them, family details, licence records, typography tokens, API keys (stored only as a hash), and an audit log of changes.
 
@@ -25,6 +27,7 @@ We set one cookie, `th_session`, to keep you signed in. It is HTTP-only and expi
 ## Third parties
 
 - **Hosting:** the app, database and file storage run on the operator's hosting (for example Vercel, Neon and Vercel Blob).
+- **Email:** if the operator enables it, password-reset emails are sent through Resend.
 - **Google Fonts:** only if you choose *Load external* for a Google family do pages request fonts from Google's servers. Workspaces can be set to *self-host only* to prevent this.
 
 ## Your choices

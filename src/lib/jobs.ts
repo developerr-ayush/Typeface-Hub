@@ -51,19 +51,23 @@ export function startJob(jobId: string) {
   after(() => runJob(jobId).catch((e) => console.error('[jobs] run failed', e)));
 }
 
-const STALE_MINUTES = 10;
+const STALE_MINUTES = 5;
+const MAX_ATTEMPTS = 3;
 
 export async function runJob(jobId: string) {
-  // Claim the job atomically so it never runs twice at the same time.
+  // Claim the job atomically so it never runs twice at the same time. A job
+  // still marked processing but without a recent heartbeat has died and can be taken over.
+  const staleBefore = new Date(Date.now() - STALE_MINUTES * 60_000);
   const [job] = await db
     .update(schema.jobs)
-    .set({ status: 'processing', startedAt: new Date(), step: 'Starting', error: null, attempts: sql`${schema.jobs.attempts} + 1` })
+    .set({ status: 'processing', startedAt: new Date(), heartbeatAt: new Date(), step: 'Starting', error: null, attempts: sql`${schema.jobs.attempts} + 1` })
     .where(
       and(
         eq(schema.jobs.id, jobId),
+        lt(schema.jobs.attempts, MAX_ATTEMPTS),
         or(
           eq(schema.jobs.status, 'queued'),
-          and(eq(schema.jobs.status, 'processing'), lt(schema.jobs.startedAt, new Date(Date.now() - STALE_MINUTES * 60_000))),
+          and(eq(schema.jobs.status, 'processing'), sql`coalesce(${schema.jobs.heartbeatAt}, ${schema.jobs.startedAt}) < ${staleBefore.toISOString()}`),
         ),
       ),
     )
@@ -114,10 +118,48 @@ export async function runJob(jobId: string) {
   }
 }
 
+/**
+ * Pick up jobs that never started (for example the server stopped before the
+ * background task ran) or stopped sending heartbeats (the server restarted
+ * mid-job). Jobs that died MAX_ATTEMPTS times are marked failed.
+ */
+export async function resumeStaleJobs(workspaceId: string, opts: { inline?: boolean } = {}) {
+  const staleBefore = new Date(Date.now() - STALE_MINUTES * 60_000);
+  const queuedBefore = new Date(Date.now() - 30_000);
+  const stuck = await db
+    .select({ id: schema.jobs.id, attempts: schema.jobs.attempts, status: schema.jobs.status })
+    .from(schema.jobs)
+    .where(
+      and(
+        eq(schema.jobs.workspaceId, workspaceId),
+        or(
+          and(eq(schema.jobs.status, 'queued'), lt(schema.jobs.createdAt, queuedBefore)),
+          and(eq(schema.jobs.status, 'processing'), sql`coalesce(${schema.jobs.heartbeatAt}, ${schema.jobs.startedAt}) < ${staleBefore.toISOString()}`),
+        ),
+      ),
+    )
+    .limit(10);
+  for (const job of stuck) {
+    if (job.attempts >= MAX_ATTEMPTS) {
+      await markFailed(job.id);
+      await db
+        .update(schema.jobs)
+        .set({ status: 'failed', error: `Processing stopped responding ${job.attempts} times. Check the files and retry.`, finishedAt: new Date() })
+        .where(eq(schema.jobs.id, job.id));
+    } else if (opts.inline) {
+      // Already running in the background (after the response): process here.
+      await runJob(job.id).catch((e) => console.error('[jobs] resume failed', e));
+    } else {
+      startJob(job.id);
+    }
+  }
+  return stuck.length;
+}
+
 export async function retryJob(actor: Actor, jobId: string) {
   const [job] = await db
     .update(schema.jobs)
-    .set({ status: 'queued', error: null, step: null, finishedAt: null })
+    .set({ status: 'queued', error: null, step: null, finishedAt: null, attempts: 0 })
     .where(and(eq(schema.jobs.id, jobId), eq(schema.jobs.workspaceId, actor.workspace.id), inArray(schema.jobs.status, ['failed', 'processing'])))
     .returning();
   if (!job) return null;
@@ -166,7 +208,7 @@ class JobContext {
   constructor(public job: Job) {}
   async setStep(step: string) {
     this.step = step;
-    await db.update(schema.jobs).set({ step }).where(eq(schema.jobs.id, this.job.id));
+    await db.update(schema.jobs).set({ step, heartbeatAt: new Date() }).where(eq(schema.jobs.id, this.job.id));
   }
 }
 

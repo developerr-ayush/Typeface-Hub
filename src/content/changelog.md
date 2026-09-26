@@ -7,6 +7,17 @@ description: What's new in Typeface Hub.
 
 ## September 2026
 
+### Security and reliability
+
+- Sign-in, sign-up and password reset are rate limited per network and per account, with a global safety limit.
+- **Forgot your password?** sends a one-time reset link (by email with Resend, or to the server log). Resetting or changing a password signs out other devices.
+- New **Account** page to change your name and password.
+- Original font files and cached kits can be kept in a private Vercel Blob store (`BLOB_PRIVATE_READ_WRITE_TOKEN`).
+- Docker generates a random session secret on first start; weak or example secrets are refused in production.
+- Jobs interrupted by a restart or deploy resume automatically; after three failures they're marked failed with a clear reason.
+- CSS API statistics only count families that exist.
+- Browser tests (Playwright) now run in CI against a real database.
+
 ### Documentation, new logo and site pages
 
 - A full documentation site: getting started, guides, API reference and troubleshooting.

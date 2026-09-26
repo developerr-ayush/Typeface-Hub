@@ -32,9 +32,13 @@ Browsers synthesise bold or italic when the requested face doesn't exist. Reques
 
 Open **Jobs**. Each failed job shows the step it stopped at and the reason. Fix the cause (for example a corrupt file) and click **Retry**, or upload again.
 
-## Sign-in fails in production
+## Sign-in problems
 
-Set `AUTH_SECRET` in your environment variables and redeploy.
+- **Forgot your password:** use **Forgot your password?** on the sign-in page. Reset links work once, for one hour, and resetting signs you out on other devices.
+- **No reset email arrives:** email needs `RESEND_API_KEY` and `EMAIL_FROM`. Without them, the link is written to the server log; with Docker, run `docker compose logs app` and look for *Reset your Typeface Hub password*.
+- **"Too many sign-in attempts":** after 10 failed attempts for one account (or 20 from one network) in 15 minutes, sign-in pauses until the time shown.
+- **Sign-in fails in production:** set `AUTH_SECRET` (32+ random characters) and redeploy.
+- **Signed out after changing your password:** other devices are signed out on purpose; sign in again there.
 
 ## Docker
 

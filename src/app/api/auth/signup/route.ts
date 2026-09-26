@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createSession, hashPassword } from '@/lib/auth';
 import { db, schema } from '@/lib/db';
 import { conflict, handler, json, readJson } from '@/lib/http';
+import { rateLimit } from '@/lib/rate-limit';
 import { createWorkspace } from '@/lib/workspaces';
 
 const Body = z.object({
@@ -14,6 +15,7 @@ const Body = z.object({
 
 export const POST = handler(async (req) => {
   const body = Body.parse(await readJson(req));
+  await rateLimit(req, { name: 'signup', perIp: 10, windowSeconds: 3600, global: 500, message: 'Too many sign-ups from your network.' });
   const existing = await db.query.users.findFirst({ where: eq(sql`lower(${schema.users.email})`, body.email) });
   if (existing) throw conflict('An account with this email already exists. Sign in instead.');
   const [user] = await db
