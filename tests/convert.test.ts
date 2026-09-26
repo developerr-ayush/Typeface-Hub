@@ -48,3 +48,28 @@ describe('convertFonts', () => {
     await expect(convertFonts([{ filename: 'x.ttf', buffer: Buffer.from('nope nope nope') }], {})).rejects.toThrow(/No usable fonts/);
   });
 });
+
+describe('demo page', () => {
+  it('lists every combination with its CSS', async () => {
+    const { combinations, cssFor, renderDemo } = await import('@/lib/kit-demo');
+    const face = {
+      name: 'Variable Roman',
+      style: 'normal' as const,
+      weight: [300, 700] as [number, number],
+      stretch: [75, 100] as [number, number],
+      axes: [
+        { tag: 'wght', min: 300, max: 700, default: 400 },
+        { tag: 'wdth', min: 75, max: 100, default: 100 },
+        { tag: 'opsz', min: 14, max: 32, default: 14 },
+      ],
+      instances: [{ name: 'Bold', coords: { wght: 700, wdth: 100, opsz: 14 } }, { name: 'Black', coords: { wght: 900, wdth: 100, opsz: 14 } }],
+    };
+    expect(combinations(face)).toHaveLength(5 * 2 * 2); // wght 300..700 × wdth 75/100 × opsz 14/32
+    expect(cssFor(face, { wght: 700, wdth: 75, opsz: 32 }, "'X'")).toEqual(["font-family: 'X';", 'font-weight: 700;', 'font-stretch: 75%;', "font-variation-settings: 'opsz' 32;"]);
+    const html = renderDemo({ family: 'X', cssName: 'X', stack: "'X'", cssFile: 'css/x.css', version: null, faces: [face] });
+    expect(html).toContain('All 20 combinations');
+    expect(html).toContain('Named instances');
+    expect(html).toContain('>Bold<');
+    expect(html).not.toContain('>Black<'); // outside the kept weight range
+  });
+});

@@ -6,6 +6,7 @@ import { fallbackRule } from './css-api';
 import type { schema } from './db';
 import { FontError, readFont } from './fonts/metadata';
 import { renameFont, styleNames } from './fonts/names';
+import { renderDemo, type DemoFace } from './kit-demo';
 import { instanceFont, slugify } from './fonts/process';
 import { planSubsets, SUBSETS } from './fonts/unicode';
 import { badRequest } from './http';
@@ -88,7 +89,6 @@ const toText = (cps: number[]) => {
   return out;
 };
 const q = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
-const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 function chunksFor(characterSet: number[], opts: KitOptions): Chunk[] {
   const latin = SUBSETS.find((s) => s.name === 'latin')!;
@@ -234,7 +234,7 @@ export async function buildKit(family: Family, version: { id: string; number: nu
   const filename = `${familySlug}-webfont-kit-v${version.number}.zip`;
 
   // Same options on the same version always produce the same kit, so cache it.
-  const cacheKey = `kits/${version.id}/${createHash('sha256').update(JSON.stringify({ ...opts, faceIds: opts.faceIds?.slice().sort(), v: 3 })).digest('hex').slice(0, 20)}.zip`;
+  const cacheKey = `kits/${version.id}/${createHash('sha256').update(JSON.stringify({ ...opts, faceIds: opts.faceIds?.slice().sort(), v: 4 })).digest('hex').slice(0, 20)}.zip`;
   const cached = await getObject(cacheKey);
   if (cached) return { filename, zip: new Uint8Array(cached), files: [], cached: true };
 
@@ -258,8 +258,17 @@ export async function buildKitTree(family: KitFamily, versionNumber: number | nu
   const cssBlocks: string[] = [];
   const prefix = opts.pathPrefix.endsWith('/') || !opts.pathPrefix ? opts.pathPrefix : `${opts.pathPrefix}/`;
 
+  const demoFaces: DemoFace[] = [];
   for (const face of kitFacesList) {
     const meta = readFont(face.buffer);
+    demoFaces.push({
+      name: face.name,
+      style: face.style,
+      weight: face.weight,
+      stretch: face.stretch,
+      axes: meta.axes.filter((a) => a.max > a.min).map((a) => ({ tag: a.tag, name: a.name, min: +a.min.toFixed(2), max: +a.max.toFixed(2), default: +a.default.toFixed(2) })),
+      instances: meta.namedInstances.map((n) => ({ name: n.name, coords: n.coords })),
+    });
     const chunks = chunksFor(meta.characterSet, opts);
     for (const chunk of chunks) {
       if (!chunk.text) continue;
@@ -307,49 +316,7 @@ export async function buildKitTree(family: KitFamily, versionNumber: number | nu
   if (opts.tokensCss) tree.css = { ...(tree.css as object), 'tokens.css': strToU8(opts.tokensCss) } as Zippable;
 
   if (opts.demo) {
-    const rows = kitFacesList
-      .map((f) => {
-        const w = f.weight[0] === f.weight[1] ? f.weight[0] : Math.round((f.weight[0] + f.weight[1]) / 2);
-        return `      <section>
-        <div class="meta">${esc(f.name)} · ${f.weight[0] === f.weight[1] ? f.weight[0] : `${f.weight[0]}–${f.weight[1]}`} ${f.style}</div>
-        <p style="font-weight:${w};font-style:${f.style}">The quick brown fox jumps over the lazy dog</p>
-        <p class="small" style="font-weight:${w};font-style:${f.style}">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !?&amp;@€</p>
-      </section>`;
-      })
-      .join('\n');
-    const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${esc(family.displayName)} · web font kit</title>
-    <link rel="stylesheet" href="css/${cssName}" />
-    <style>
-      body { margin: 0; padding: 40px 24px; font: 14px/1.5 system-ui, sans-serif; color: #16181d; background: #f6f7f9; }
-      main { max-width: 900px; margin: 0 auto; }
-      h1 { font-family: ${esc(stack)}; font-size: 48px; margin: 0 0 4px; font-weight: 400; }
-      .lead { color: #676d7c; margin: 0 0 32px; }
-      section { background: #fff; border: 1px solid #e4e6eb; border-radius: 12px; padding: 20px 24px; margin-bottom: 12px; }
-      .meta { color: #676d7c; font-size: 12px; margin-bottom: 8px; }
-      section p { font-family: ${esc(stack)}; font-size: 32px; margin: 0; line-height: 1.25; }
-      section p.small { font-size: 18px; margin-top: 8px; color: #3b3f4a; }
-      pre { background: #0f1117; color: #e6e8ee; padding: 16px; border-radius: 10px; overflow-x: auto; }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>${esc(family.displayName)}</h1>
-      <p class="lead">${version.number ? `Version ${version.number} · ` : ''}${kitFacesList.length} face${kitFacesList.length === 1 ? '' : 's'} · open this file in a browser to preview the kit.</p>
-${rows}
-      <h2>How to use</h2>
-<pre>&lt;link rel="stylesheet" href="css/${cssName}"&gt;
-
-body { font-family: ${esc(stack)}; }</pre>
-    </main>
-  </body>
-</html>
-`;
-    tree['demo.html'] = strToU8(html);
+    tree['demo.html'] = strToU8(renderDemo({ family: family.displayName, cssName: family.cssName, stack, cssFile: `css/${cssName}`, version: version.number, faces: demoFaces }));
   }
 
   const licence = family.licence;
