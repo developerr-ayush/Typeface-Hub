@@ -28,7 +28,7 @@ export interface ConvertSummary {
 }
 
 /** Expand ZIPs (e.g. old Transfonter exports) into their font files; ignore CSS, EOT and SVG. */
-function expand(inputs: ConvertInput[], skipped: ConvertSummary['skipped']): ConvertInput[] {
+export function expand(inputs: ConvertInput[], skipped: ConvertSummary['skipped']): ConvertInput[] {
   const out: ConvertInput[] = [];
   for (const input of inputs) {
     if (input.buffer[0] === 0x50 && input.buffer[1] === 0x4b) {
@@ -148,4 +148,58 @@ export async function convertFonts(inputs: ConvertInput[], opts: Partial<KitOpti
   const zip = zipSync(tree, { level: 6 });
   const filename = families.size === 1 ? `${slugify([...families.keys()][0])}-webfont-kit.zip` : 'webfont-kits.zip';
   return { zip, filename, summary };
+}
+
+export interface InspectedFont {
+  file: string;
+  fromZip?: string;
+  ok: boolean;
+  error?: string;
+  family?: string;
+  subfamily?: string;
+  style?: 'normal' | 'italic';
+  weight?: number;
+  format?: string;
+  bytes: number;
+  isVariable?: boolean;
+  axes?: { tag: string; name?: string; min: number; max: number; default: number }[];
+  namedInstances?: string[];
+  glyphs?: number;
+  scripts?: string[];
+}
+
+/** Read what each uploaded file is (family, style, static or variable, axes) without converting it. */
+export function inspectFonts(inputs: ConvertInput[]): InspectedFont[] {
+  const out: InspectedFont[] = [];
+  for (const input of inputs) {
+    const isZip = input.buffer[0] === 0x50 && input.buffer[1] === 0x4b;
+    const skipped: ConvertSummary['skipped'] = [];
+    const files = isZip ? expand([input], skipped) : [input];
+    for (const s of skipped) out.push({ file: s.file, ok: false, error: s.reason, bytes: input.buffer.length });
+    for (const f of files) {
+      try {
+        const meta = readFont(f.buffer);
+        out.push({
+          file: f.filename,
+          fromZip: isZip ? input.filename : undefined,
+          ok: true,
+          family: meta.family,
+          subfamily: meta.subfamily,
+          style: meta.style,
+          weight: meta.weight,
+          format: meta.format,
+          bytes: f.buffer.length,
+          isVariable: meta.isVariable,
+          axes: meta.axes.map((a) => ({ tag: a.tag, name: a.name, min: +a.min.toFixed(2), max: +a.max.toFixed(2), default: +a.default.toFixed(2) })),
+          namedInstances: meta.namedInstances.map((n) => n.name),
+          glyphs: meta.characterSet.length,
+          scripts: meta.scripts.slice(0, 8),
+        });
+      } catch (e) {
+        const err = e as FontError;
+        out.push({ file: f.filename, fromZip: isZip ? input.filename : undefined, ok: false, error: err.fix ? `${err.message} ${err.fix}` : err.message, bytes: f.buffer.length });
+      }
+    }
+  }
+  return out;
 }

@@ -6,7 +6,7 @@ import { fallbackRule } from './css-api';
 import type { schema } from './db';
 import { FontError, readFont } from './fonts/metadata';
 import { renameFont, styleNames } from './fonts/names';
-import { slugify } from './fonts/process';
+import { instanceFont, slugify } from './fonts/process';
 import { planSubsets, SUBSETS } from './fonts/unicode';
 import { badRequest } from './http';
 import { getObject, putObject } from './storage';
@@ -24,6 +24,8 @@ export interface KitOptions {
   customText?: string;
   variable: 'variable' | 'static';
   staticWeights?: number[];
+  /** Per-axis settings for variable fonts: a {min, max} range to keep, or a number to pin the axis to. */
+  axes?: Record<string, { min: number; max: number } | number>;
   pathPrefix: string;
   display: string;
   fallback: boolean;
@@ -125,29 +127,88 @@ async function kitFaces(familyName: string, faces: KitSource[], opts: KitOptions
     const isCff = face.masterFormat === 'otf' || master.subarray(0, 4).toString('latin1') === 'OTTO';
     const italic = face.style === 'italic' ? '-italic' : '';
 
+    // Axis settings that apply to this face, clamped to its ranges (ital stays as-is).
+    const settings = axisSettings(face.axes, opts.axes);
+
     if (face.axes.length && opts.variable === 'static') {
       const wght = face.axes.find((a) => a.tag === 'wght');
-      const weights = (opts.staticWeights?.length ? opts.staticWeights : [400, 700]).filter((w) => !wght || (w >= wght.min && w <= wght.max));
+      const wghtSetting = settings.wght;
+      const weights = (typeof wghtSetting === 'number' ? [wghtSetting] : opts.staticWeights?.length ? opts.staticWeights : [400, 700]).filter(
+        (w) => !wght || (w >= wght.min && w <= wght.max),
+      );
       if (!weights.length) throw badRequest(`None of the chosen weights are inside ${face.name}'s range (${face.weightMin}–${face.weightMax}).`);
       for (const w of [...new Set(weights)].sort((a, b) => a - b)) {
-        // Pin every axis: wght to the chosen weight, the rest to their defaults.
-        const pins = Object.fromEntries(face.axes.map((a) => [a.tag, a.tag === 'wght' ? w : a.default]));
+        // Pin every axis: wght to the chosen weight, the rest to the pinned value, else the default (clamped to any range).
+        const pins = Object.fromEntries(
+          face.axes.map((a) => {
+            if (a.tag === 'wght') return [a.tag, w];
+            const s = settings[a.tag];
+            if (typeof s === 'number') return [a.tag, s];
+            if (s) return [a.tag, Math.min(s.max, Math.max(s.min, a.default))];
+            return [a.tag, a.default];
+          }),
+        );
         const instance = Buffer.from(await subsetFont(master, null, { targetFormat: 'sfnt', keepAllGlyphs: true, variationAxes: pins, preserveNameIds: [0, 1, 2, 3, 4, 5, 6, 13, 14, 16, 17] }));
+        const wdth = typeof pins.wdth === 'number' ? Math.round(pins.wdth) : face.stretchMin;
         // Give each static instance its own names so desktop installs don't all show as the default instance.
-        const buffer = renameFont(instance, styleNames(familyName, w, face.style === 'italic'));
-        out.push({ name: `${w}${italic ? ' Italic' : ''}`, slug: `${w}${italic}`, style: face.style, weight: [w, w], stretch: [face.stretchMin, face.stretchMin], buffer, isCff, source: face });
+        const buffer = renameFont(instance, styleNames(familyName, w, face.style === 'italic', wdth));
+        out.push({ name: `${w}${italic ? ' Italic' : ''}`, slug: `${w}${wdth !== 100 ? `-w${wdth}` : ''}${italic}`, style: face.style, weight: [w, w], stretch: [wdth, wdth], buffer, isCff, source: face });
       }
-    } else {
+      continue;
+    }
+
+    if (face.axes.length && Object.keys(settings).length) {
+      // Partial instancing: keep the chosen ranges, pin the rest. The result may still be variable.
+      const limited = await instanceFont(master, settings);
+      const meta = readFont(limited);
+      const w = meta.axes.find((a) => a.tag === 'wght');
+      const d = meta.axes.find((a) => a.tag === 'wdth');
+      const pinnedW = typeof settings.wght === 'number' ? Math.round(settings.wght) : null;
+      const pinnedD = typeof settings.wdth === 'number' ? Math.round(settings.wdth) : null;
+      const weight: [number, number] = w ? [Math.round(w.min), Math.round(w.max)] : [pinnedW ?? face.weightMin, pinnedW ?? face.weightMin];
+      const stretch: [number, number] = d ? [Math.round(d.min), Math.round(d.max)] : [pinnedD ?? face.stretchMin, pinnedD ?? face.stretchMin];
+      const stillVariable = meta.axes.length > 0;
       out.push({
-        name: face.name,
-        slug: face.axes.length ? `variable${italic}` : `${face.weightMin}${face.stretchMin !== 100 ? `-w${face.stretchMin}` : ''}${italic}`,
+        name: stillVariable ? face.name : `${weight[0]}${italic ? ' Italic' : ''}`,
+        slug: stillVariable ? `variable${italic}` : `${weight[0]}${stretch[0] !== 100 ? `-w${stretch[0]}` : ''}${italic}`,
         style: face.style,
-        weight: [face.weightMin, face.weightMax],
-        stretch: [face.stretchMin, face.stretchMax],
-        buffer: master,
+        weight,
+        stretch,
+        buffer: stillVariable ? limited : renameFont(limited, styleNames(familyName, weight[0], face.style === 'italic', stretch[0])),
         isCff,
         source: face,
       });
+      continue;
+    }
+
+    out.push({
+      name: face.name,
+      slug: face.axes.length ? `variable${italic}` : `${face.weightMin}${face.stretchMin !== 100 ? `-w${face.stretchMin}` : ''}${italic}`,
+      style: face.style,
+      weight: [face.weightMin, face.weightMax],
+      stretch: [face.stretchMin, face.stretchMax],
+      buffer: master,
+      isCff,
+      source: face,
+    });
+  }
+  return out;
+}
+
+/** The axis settings relevant to one face, clamped to its ranges. */
+function axisSettings(axes: Face['axes'], wanted: KitOptions['axes']) {
+  const out: Record<string, { min: number; max: number } | number> = {};
+  if (!wanted) return out;
+  for (const a of axes) {
+    const s = wanted[a.tag];
+    if (s === undefined || a.tag === 'ital') continue;
+    const clamp = (v: number) => Math.min(a.max, Math.max(a.min, v));
+    if (typeof s === 'number') out[a.tag] = clamp(s);
+    else {
+      const min = clamp(Math.min(s.min, s.max));
+      const max = clamp(Math.max(s.min, s.max));
+      if (min === a.min && max === a.max) continue; // full range: nothing to do
+      out[a.tag] = min === max ? min : { min, max };
     }
   }
   return out;
@@ -173,7 +234,7 @@ export async function buildKit(family: Family, version: { id: string; number: nu
   const filename = `${familySlug}-webfont-kit-v${version.number}.zip`;
 
   // Same options on the same version always produce the same kit, so cache it.
-  const cacheKey = `kits/${version.id}/${createHash('sha256').update(JSON.stringify({ ...opts, faceIds: opts.faceIds?.slice().sort(), v: 2 })).digest('hex').slice(0, 20)}.zip`;
+  const cacheKey = `kits/${version.id}/${createHash('sha256').update(JSON.stringify({ ...opts, faceIds: opts.faceIds?.slice().sort(), v: 3 })).digest('hex').slice(0, 20)}.zip`;
   const cached = await getObject(cacheKey);
   if (cached) return { filename, zip: new Uint8Array(cached), files: [], cached: true };
 

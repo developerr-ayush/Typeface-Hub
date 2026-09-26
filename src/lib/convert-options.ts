@@ -7,6 +7,7 @@ export const KitOptionsSchema = z.object({
   customText: z.string().max(2000).optional(),
   variable: z.enum(['variable', 'static']).default('variable'),
   staticWeights: z.array(z.number().int().min(1).max(1000)).max(20).optional(),
+  axes: z.record(z.string().regex(/^[A-Za-z0-9]{4}$/), z.union([z.number(), z.object({ min: z.number(), max: z.number() })])).optional(),
   pathPrefix: z.string().max(200).regex(/^[\w./-]*$/, 'Use a relative or absolute path such as ../fonts/').default('../fonts/'),
   display: z.enum(['auto', 'block', 'swap', 'fallback', 'optional']).default('swap'),
   fallback: z.boolean().default(true),

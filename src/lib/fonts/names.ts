@@ -9,12 +9,20 @@ const WEIGHT_NAMES: Record<number, string> = {
   600: 'SemiBold', 700: 'Bold', 800: 'ExtraBold', 900: 'Black',
 };
 
-export function styleNames(family: string, weight: number, italic: boolean) {
+const WIDTH_NAMES: [number, string][] = [
+  [50, 'UltraCondensed'], [62.5, 'ExtraCondensed'], [75, 'Condensed'], [87.5, 'SemiCondensed'], [100, ''],
+  [112.5, 'SemiExpanded'], [125, 'Expanded'], [150, 'ExtraExpanded'], [200, 'UltraExpanded'],
+];
+const widthName = (width: number) => WIDTH_NAMES.reduce((a, b) => (Math.abs(b[0] - width) < Math.abs(a[0] - width) ? b : a))[1];
+
+export function styleNames(family: string, weight: number, italic: boolean, width = 100) {
   const w = WEIGHT_NAMES[Math.round(weight / 100) * 100] ?? String(weight);
-  const typographic = w === 'Regular' && italic ? 'Italic' : italic ? `${w} Italic` : w;
+  const wd = widthName(width);
+  const base = [wd, w === 'Regular' && wd ? '' : w].filter(Boolean).join(' ');
+  const typographic = base === 'Regular' && italic ? 'Italic' : italic ? `${base} Italic` : base;
   // Legacy (name ID 1/2) families only allow Regular/Bold/Italic/Bold Italic.
   const ribbi = weight === 400 || weight === 700;
-  const legacyFamily = ribbi ? family : `${family} ${w}`;
+  const legacyFamily = [family, wd, ribbi ? '' : w].filter(Boolean).join(' ');
   const legacySub = `${weight === 700 ? 'Bold' : 'Regular'}${italic ? ' Italic' : ''}`.replace('Regular Italic', 'Italic');
   return {
     1: legacyFamily,

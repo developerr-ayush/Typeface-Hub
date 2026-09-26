@@ -17,7 +17,7 @@ Built with Next.js 16 (App Router), Postgres (Drizzle ORM), Vercel Blob, HarfBuz
 | **Typography** | Font roles (heading, body, display, mono, custom), text styles H1–H6 / body / caption / button / label, responsive sizes per breakpoint or fluid `clamp()`, type-scale generator, themes, accessibility checks. Output as CSS custom properties, JSON and an **SDUI contract** (`fonts.css[]`, `fonts.preload[]`, `fonts.preconnect[]`, `typography.tokens`). |
 | **Governance** | Every upload of an existing family becomes a new **draft version**; review screen with editable faces, side-by-side compare, publish, one-click **rollback**, licence records and confirmation, archive with in-use protection, roles (Viewer, Editor, Publisher, Admin), multi-tenant workspaces and a full **audit log**. |
 | **Download kit** | On any family, download a ZIP with the fonts in WOFF2, WOFF and TTF/OTF, a ready-made stylesheet, a metric-matched fallback, optional typography tokens, a `demo.html` preview and a README. Options cover faces, character sets (Latin, Latin + Extended, split by script, full, or custom characters), static weights cut from variable fonts, the font path and `font-display`. Also available as `POST /api/v1/families/{id}/kit`. |
-| **Free converter** | A public page at `/convert`, no account needed: upload TTF / OTF / WOFF / WOFF2 or a ZIP, pick formats and characters, and download the same kind of kit. Nothing is stored; uploads are deleted after conversion. Rate limited to 30 conversions per hour per network, 12 files of up to 15 MB each. |
+| **Free converter** | A public page at `/convert`, no account needed: upload TTF / OTF / WOFF / WOFF2 or a ZIP, see right away which files are variable or static and which axes they have, try the font live with sliders, limit or pin any axis (weight, width, optical size, slant, custom), pick formats and characters, and download the same kind of kit. Nothing is stored; uploads are deleted after conversion. Rate limited to 30 conversions per hour per network, 12 files of up to 15 MB each. |
 | **Developers** | REST API under `/api/v1` with workspace **API keys** (delivery / read / write / publish scopes), CSS API, token stylesheet, SDUI endpoint. See the **Developers** page in the app. |
 | **Monitoring** | CSS API latency (p50/p95 histogram), error rate and most-requested families; pipeline success rate, durations and failure reasons. |
 
@@ -112,6 +112,7 @@ curl -X POST https://your-app.vercel.app/api/v1/families/<family-id>/kit \
 | `faceIds` | face ids to include | all faces |
 | `characters` | `latin`, `latin-ext`, `split`, `full`, `custom` (with `customText`) | `latin-ext` |
 | `variable` | `variable`, or `static` with `staticWeights` | `variable` |
+| `axes` | per axis: `{"min":300,"max":700}` to keep a range, or a number to pin it, e.g. `{"wght":{"min":300,"max":700},"wdth":100,"opsz":14}`. In static mode, pinned values are used for every static file. | none (keep every axis) |
 | `pathPrefix` | font path used in the CSS | `../fonts/` |
 | `display` | `swap`, `optional`, `fallback`, `block`, `auto` | `swap` |
 | `fallback`, `demo`, `tokens` | include the fallback face, `demo.html`, `tokens.css` | `true`, `true`, `false` |

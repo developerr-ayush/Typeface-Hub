@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AxisControls, mergeAxes, toAxesOption, type AxisSetting } from '../axis-controls';
 import { Alert, Button, Card, CardHeader, Checkbox, cx, Input, Select } from '../ui';
 import type { FamilyViewData, VersionData } from './shared';
 
@@ -28,6 +29,7 @@ export function DownloadKit({ data, version }: { data: FamilyViewData; version: 
   const [customText, setCustomText] = useState('');
   const [variable, setVariable] = useState<'variable' | 'static'>('variable');
   const [staticWeights, setStaticWeights] = useState<number[]>(weightChoices.filter((w) => w === 400 || w === 700));
+  const [axisSettings, setAxisSettings] = useState<Record<string, AxisSetting>>({});
   const [pathPrefix, setPathPrefix] = useState('../fonts/');
   const [display, setDisplay] = useState(family.display);
   const [fallback, setFallback] = useState(true);
@@ -53,6 +55,7 @@ export function DownloadKit({ data, version }: { data: FamilyViewData; version: 
           customText: characters === 'custom' ? customText : undefined,
           variable,
           staticWeights: variable === 'static' ? staticWeights : undefined,
+          axes: toAxesOption(axisSettings),
           pathPrefix,
           display,
           fallback,
@@ -143,6 +146,8 @@ export function DownloadKit({ data, version }: { data: FamilyViewData; version: 
                     ))}
                   </div>
                 )}
+                <p className="pt-1 text-xs text-muted">{variable === 'static' ? 'Values for the other axes in every static file:' : 'Limit or pin axes you don’t need to make files smaller:'}</p>
+                <AxisControls axes={mergeAxes(variableFaces.map((f) => f.axes))} value={axisSettings} onChange={setAxisSettings} staticMode={variable === 'static'} />
               </div>
             </fieldset>
           )}

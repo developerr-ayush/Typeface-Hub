@@ -79,3 +79,14 @@ describe('font renaming', () => {
     expect(styleNames('Brand', 300, false)[1]).toBe('Brand Light');
   });
 });
+
+describe('style names with width', () => {
+  it('names condensed and expanded instances', async () => {
+    const { styleNames } = await import('@/lib/fonts/names');
+    expect(styleNames('Open Sans', 700, false, 75)[17]).toBe('Condensed Bold');
+    expect(styleNames('Open Sans', 700, false, 75)[1]).toBe('Open Sans Condensed');
+    expect(styleNames('Open Sans', 400, true, 75)[17]).toBe('Condensed Italic');
+    expect(styleNames('Open Sans', 300, false, 125)[1]).toBe('Open Sans Expanded Light');
+    expect(styleNames('Open Sans', 400, false)[17]).toBe('Regular');
+  });
+});
