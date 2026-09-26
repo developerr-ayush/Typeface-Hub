@@ -4,6 +4,8 @@ A font management and delivery platform. Add a font once, from any source, and e
 
 **Upload or pick a font → the platform validates, converts, subsets and catalogues it → a Google-style CSS API delivers exactly what each page renders.**
 
+Full documentation is in the app at `/docs` (source: `src/content/docs/*.md`).
+
 Built with Next.js 16 (App Router), Postgres (Drizzle ORM), Vercel Blob, HarfBuzz (`subset-font`) and `fontkit`.
 
 ## What it does

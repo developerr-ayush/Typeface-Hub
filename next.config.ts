@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['subset-font', 'harfbuzzjs', 'fontverter', 'wawoff2', 'fontkit'],
   outputFileTracingIncludes: {
     '/api/**/*': ['./node_modules/harfbuzzjs/dist/*.wasm'],
+    '/docs/**/*': ['./src/content/**/*.md'],
+    '/(about|privacy|terms|changelog)': ['./src/content/**/*.md'],
   },
   async headers() {
     return [

@@ -104,6 +104,9 @@ export function Shell({
         <Link href="/convert" className="flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium text-muted hover:bg-black/[0.04] hover:text-ink">
           Free converter ↗
         </Link>
+        <Link href="/docs" className="flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium text-muted hover:bg-black/[0.04] hover:text-ink">
+          Docs ↗
+        </Link>
       </div>
       <div className="border-t border-line px-4 py-3">
         <div className="truncate text-[13px] font-medium text-ink">{user.name}</div>

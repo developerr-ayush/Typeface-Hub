@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Converter } from '@/components/converter';
-import { Logo } from '@/components/logo';
+import { SiteFooter, SiteHeader } from '@/components/site-chrome';
 import { getUser } from '@/lib/auth';
 import { CONVERT_LIMITS } from '@/lib/convert';
 import { usingBlob } from '@/lib/storage';
@@ -30,29 +30,7 @@ export default async function ConvertPage() {
   const user = await getUser();
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link href="/">
-            <Logo />
-          </Link>
-          <nav className="flex items-center gap-2 text-sm">
-            {user ? (
-              <Link href="/" className="rounded-lg bg-ink px-3.5 py-2 font-medium text-white hover:bg-black">
-                Open app
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" className="rounded-lg px-3 py-2 font-medium text-ink-2 hover:bg-black/5">
-                  Sign in
-                </Link>
-                <Link href="/signup" className="rounded-lg bg-ink px-3.5 py-2 font-medium text-white hover:bg-black">
-                  Get started
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+      <SiteHeader user={user} active="/convert" />
 
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <div className="mb-8 max-w-2xl">
@@ -109,6 +87,7 @@ body { font-family: 'Montserrat', 'Montserrat Fallback', system-ui, sans-serif; 
           </Link>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
