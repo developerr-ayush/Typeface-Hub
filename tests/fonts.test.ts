@@ -65,3 +65,17 @@ describe('tokens', () => {
     expect(a11yWarnings({ body: { ...DEFAULT_TEXT_STYLES.body, size: { mobile: 0.8, tablet: 1, desktop: 1 }, lineHeight: 1.2 } })).toHaveLength(2);
   });
 });
+
+describe('font renaming', () => {
+  it('rewrites names and keeps the font valid', async () => {
+    const { renameFont, styleNames } = await import('@/lib/fonts/names');
+    const out = renameFont(bakbak, styleNames('Brand Display', 300, true));
+    const meta = readFont(out);
+    expect(meta.family).toBe('Brand Display');
+    expect(meta.subfamily).toBe('Light Italic');
+    expect(meta.glyphCount).toBe(readFont(bakbak).glyphCount);
+    expect(styleNames('Brand', 700, false)[1]).toBe('Brand');
+    expect(styleNames('Brand', 700, false)[2]).toBe('Bold');
+    expect(styleNames('Brand', 300, false)[1]).toBe('Brand Light');
+  });
+});

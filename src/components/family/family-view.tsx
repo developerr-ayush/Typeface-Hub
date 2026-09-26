@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SourceBadge, StatusBadge, TypeBadge } from '../status';
-import { Badge, Tabs, timeAgo } from '../ui';
+import { Badge, Button, Tabs, timeAgo } from '../ui';
 import { EmbedPanel } from './embed';
 import { ReviewPanel } from './review';
 import { SettingsPanel } from './settings';
@@ -60,20 +60,33 @@ export function FamilyView({ data }: { data: FamilyViewData }) {
             <span className="text-xs text-muted">Updated {timeAgo(family.updatedAt)}</span>
           </div>
         </div>
-        {versions.length > 1 && (
-          <div>
-            <label htmlFor="version-select" className="mr-2 text-[13px] text-muted">
-              Viewing
-            </label>
-            <select id="version-select" value={version?.id} onChange={(e) => setVersionId(e.target.value)} className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-sm">
-              {versions.map((v) => (
-                <option key={v.id} value={v.id}>
-                  v{v.number} · {v.status}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          {versions.length > 1 && (
+            <div>
+              <label htmlFor="version-select" className="mr-2 text-[13px] text-muted">
+                Viewing
+              </label>
+              <select id="version-select" value={version?.id} onChange={(e) => setVersionId(e.target.value)} className="h-8 rounded-lg border border-line-strong bg-surface px-2 text-sm">
+                {versions.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    v{v.number} · {v.status}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {version?.faces.some((f) => f.files.length) && (
+            <Button
+              size="sm"
+              onClick={() => {
+                change('use');
+                setTimeout(() => document.getElementById('kit')?.scrollIntoView({ behavior: 'smooth' }), 50);
+              }}
+            >
+              Download kit
+            </Button>
+          )}
+        </div>
       </div>
       <Tabs
         className="mb-6"
@@ -97,7 +110,7 @@ export function FamilyView({ data }: { data: FamilyViewData }) {
           {tab === 'tester' && <TesterPanel family={family} version={version} />}
           {tab === 'review' && <ReviewPanel data={data} version={draft && version.status !== 'draft' && !data.initialVersion ? draft : version} current={current} onChange={refresh} onSelect={setVersionId} />}
           {tab === 'versions' && <VersionsPanel data={data} onChange={refresh} onView={(id) => { setVersionId(id); change('specimen'); }} />}
-          {tab === 'use' && <EmbedPanel data={data} version={current ?? version} />}
+          {tab === 'use' && <EmbedPanel data={data} version={current ?? version} kitVersion={version} />}
           {tab === 'settings' && <SettingsPanel data={data} onChange={refresh} />}
           {tab === 'activity' && (
             <ol className="space-y-2">

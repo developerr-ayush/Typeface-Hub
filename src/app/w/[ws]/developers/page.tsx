@@ -22,6 +22,7 @@ const endpoints: [string, string, string][] = [
   ['POST', '/api/v1/families/{id}/rollback', 'Roll back to a previous version { version }'],
   ['POST', '/api/v1/families/{id}/archive', 'Archive or restore { archived }'],
   ['POST', '/api/v1/families/{id}/reprocess', 'Limit or pin variable axes into a new draft'],
+  ['POST', '/api/v1/families/{id}/kit', 'Download a web font kit (ZIP): fonts in WOFF2/WOFF/TTF, CSS, demo page, README'],
   ['GET / PUT / DELETE', '/api/v1/tokens/{theme}', 'Read (format=raw|json|css) or update typography tokens'],
   ['GET', '/api/v1/sdui', 'SDUI contract for a theme (theme, styles, preload)'],
   ['GET', '/api/v1/google', 'Search the Google Fonts catalogue'],

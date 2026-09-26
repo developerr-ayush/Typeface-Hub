@@ -16,6 +16,7 @@ Built with Next.js 16 (App Router), Postgres (Drizzle ORM), Vercel Blob, HarfBuz
 | **Delivery** | `GET /fonts/{workspace}/css?family=Montserrat:ital,wght@0,400;1,700&display=swap`: Google CSS2 syntax, one `@font-face` per face per subset, WOFF2 first, `'Name Fallback'` faces with `size-adjust` / `ascent-override` to reduce layout shift, immutable one-year caching for files, CORS on everything. |
 | **Typography** | Font roles (heading, body, display, mono, custom), text styles H1–H6 / body / caption / button / label, responsive sizes per breakpoint or fluid `clamp()`, type-scale generator, themes, accessibility checks. Output as CSS custom properties, JSON and an **SDUI contract** (`fonts.css[]`, `fonts.preload[]`, `fonts.preconnect[]`, `typography.tokens`). |
 | **Governance** | Every upload of an existing family becomes a new **draft version**; review screen with editable faces, side-by-side compare, publish, one-click **rollback**, licence records and confirmation, archive with in-use protection, roles (Viewer, Editor, Publisher, Admin), multi-tenant workspaces and a full **audit log**. |
+| **Download kit** | On any family, download a ZIP with the fonts in WOFF2, WOFF and TTF/OTF, a ready-made stylesheet, a metric-matched fallback, optional typography tokens, a `demo.html` preview and a README. Options cover faces, character sets (Latin, Latin + Extended, split by script, full, or custom characters), static weights cut from variable fonts, the font path and `font-display`. Also available as `POST /api/v1/families/{id}/kit`. |
 | **Developers** | REST API under `/api/v1` with workspace **API keys** (delivery / read / write / publish scopes), CSS API, token stylesheet, SDUI endpoint. See the **Developers** page in the app. |
 | **Monitoring** | CSS API latency (p50/p95 histogram), error rate and most-requested families; pipeline success rate, durations and failure reasons. |
 
@@ -89,6 +90,32 @@ npm run catalog:build       # refresh the bundled Google Fonts catalogue and sub
 ```
 
 For server-rendered apps, call `GET /api/v1/sdui?theme=default&styles=h1,body` with a delivery API key and render the returned `css`, `preload` and `preconnect` links in the document head.
+
+## Download a kit instead of using the CSS API
+
+Open a family, click **Download kit** (or go to its **Use** tab), pick the options and click **Download ZIP**. Copy `fonts/` and `css/` into your project and add `<link rel="stylesheet" href="/css/<family>.css">`.
+
+With the API:
+
+```bash
+curl -X POST https://your-app.vercel.app/api/v1/families/<family-id>/kit \
+  -H "Authorization: Bearer $TYPEFACE_KEY" -H "Content-Type: application/json" \
+  -d '{"formats":["woff2","woff","sfnt"],"characters":"latin-ext","variable":"static","staticWeights":[400,700]}' \
+  -o kit.zip
+```
+
+| Option | Values | Default |
+| --- | --- | --- |
+| `versionId` | any version of the family | the live version (or the latest draft) |
+| `formats` | `woff2`, `woff`, `sfnt` (TTF, or OTF for CFF fonts) | `["woff2","woff"]` |
+| `faceIds` | face ids to include | all faces |
+| `characters` | `latin`, `latin-ext`, `split`, `full`, `custom` (with `customText`) | `latin-ext` |
+| `variable` | `variable`, or `static` with `staticWeights` | `variable` |
+| `pathPrefix` | font path used in the CSS | `../fonts/` |
+| `display` | `swap`, `optional`, `fallback`, `block`, `auto` | `swap` |
+| `fallback`, `demo`, `tokens` | include the fallback face, `demo.html`, `tokens.css` | `true`, `true`, `false` |
+
+The same options on the same version return a cached ZIP instantly.
 
 ## Project layout
 

@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from 'react';
 import { Alert, Card, CardHeader, Checkbox, CodeBlock, Select } from '../ui';
+import { DownloadKit } from './download-kit';
 import type { FamilyViewData, VersionData } from './shared';
 
-export function EmbedPanel({ data, version }: { data: FamilyViewData; version: VersionData }) {
+export function EmbedPanel({ data, version, kitVersion }: { data: FamilyViewData; version: VersionData; kitVersion?: VersionData }) {
   const { family, origin, ws } = data;
   const variable = version.faces.find((f) => f.axes.length);
   const options = useMemo(() => {
@@ -91,6 +92,7 @@ export function EmbedPanel({ data, version }: { data: FamilyViewData; version: V
           </p>
         </div>
       </Card>
+      <DownloadKit key={(kitVersion ?? version).id} data={data} version={kitVersion ?? version} />
     </div>
   );
 }
