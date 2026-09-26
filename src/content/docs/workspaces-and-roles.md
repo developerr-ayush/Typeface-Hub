@@ -9,7 +9,7 @@ description: Workspaces, members, roles, API keys and the audit log.
 
 A workspace is a private font library with its own typography tokens, API keys, settings and audit log, for example one per client or brand. Fonts in one workspace are never visible in another.
 
-Create workspaces from the workspace switcher in the sidebar. The workspace's **slug** appears in its public URLs, for example `/fonts/southern-brave/css`.
+Create workspaces from the workspace switcher in the sidebar. The workspace's **slug** appears in its public URLs, for example `/fonts/acme-studio/css`.
 
 ### Settings
 
