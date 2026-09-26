@@ -37,7 +37,24 @@ Optional environment variables:
 
 Font processing runs in the background after the request (`after()`), with `maxDuration` of 300 s on processing routes. Large uploads go straight from the browser to Vercel Blob, so the 4.5 MB request limit doesn't apply.
 
-## Run locally
+## Run locally with Docker
+
+The easiest way. Needs only [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+docker compose up --build
+```
+
+Open http://localhost:3000 and create an account. The first build takes a few minutes; after that `docker compose up` starts in seconds.
+
+- Postgres runs in its own container, and migrations run automatically when the app starts.
+- Data is kept in Docker volumes, so it survives restarts: `db-data` for the database and `font-files` for uploaded and generated font files.
+- `docker compose down` stops everything. `docker compose down -v` also **deletes** the database and font files.
+- After changing the code, run `docker compose up --build` again.
+- Optional: set `AUTH_SECRET` or `GOOGLE_FONTS_API_KEY` in a `.env` file next to `docker-compose.yml`, or change the public URL with `APP_URL=http://localhost:3000`.
+- The database is also exposed on `localhost:5432` (user and password `typeface`), so you can run just the database with `docker compose up db` and the app with `npm run dev` using `DATABASE_URL=postgres://typeface:typeface@localhost:5432/typeface_hub`.
+
+## Run locally without Docker
 
 Requirements: Node 20.9+ and a Postgres database.
 
