@@ -55,7 +55,7 @@ The **Stylesheet & legacy import** tab reads `@font-face` rules from any CSS URL
 
 ## Pasting existing CSS
 
-Paste stored CSS (for example from FanXP or a Transfonter export) and, if its URLs are relative, the base URL the files are served from. EOT and SVG sources are ignored. See [Migrating existing fonts](/docs/migrating).
+Paste stored CSS (for example from a Transfonter export or an older site) and, if its URLs are relative, the base URL the files are served from. EOT and SVG sources are ignored. See [Migrating existing fonts](/docs/migrating).
 
 ## Licence confirmation
 

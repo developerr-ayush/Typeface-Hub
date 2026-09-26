@@ -46,7 +46,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       </Field>
       {mode === 'signup' && (
         <Field label="Workspace name" hint="For example your company or a client property. You can add more later.">
-          {(id) => <Input id={id} name="workspace" placeholder="Southern Brave" />}
+          {(id) => <Input id={id} name="workspace" placeholder="Acme Studio" />}
         </Field>
       )}
       <Button type="submit" variant="primary" className="w-full" loading={loading}>

@@ -96,7 +96,7 @@ export function StylesheetTab({ ws, selfHostOnly }: { ws: string; selfHostOnly: 
           </Field>
         ) : (
           <div className="space-y-4">
-            <Field label="CSS" hint="Paste the stored CSS of an existing font (for example a FanXP / Transfonter stylesheet). EOT and SVG sources are ignored.">
+            <Field label="CSS" hint="Paste the stored CSS of an existing font (for example a Transfonter export). EOT and SVG sources are ignored.">
               {(id) => (
                 <Textarea
                   id={id}

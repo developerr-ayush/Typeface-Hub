@@ -105,7 +105,7 @@ export function SettingsPanel({ data, onChange }: { data: FamilyViewData; onChan
             <Field label="Fallback stack" hint="Comma separated, e.g. system-ui, sans-serif. A metric-matched “Fallback” face is added automatically.">
               {(id) => <Input id={id} value={form.fallbackStack} onChange={(e) => setForm({ ...form, fallbackStack: e.target.value })} />}
             </Field>
-            <Field label="Tags" hint="Comma separated, e.g. Southern Brave brand.">
+            <Field label="Tags" hint="Comma separated, e.g. Brand fonts.">
               {(id) => <Input id={id} value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />}
             </Field>
             {can.edit && (
@@ -150,7 +150,7 @@ export function SettingsPanel({ data, onChange }: { data: FamilyViewData; onChan
             </Field>
             <Field label="Owner">{(id) => <Input id={id} value={lic.owner} onChange={(e) => setLic({ ...lic, owner: e.target.value })} placeholder="Client or foundry" />}</Field>
             <Field label="Allowed domains" hint="Comma separated. * means anywhere.">
-              {(id) => <Input id={id} value={lic.allowedDomains} onChange={(e) => setLic({ ...lic, allowedDomains: e.target.value })} placeholder="southernbrave.com, *.fanxp.com" />}
+              {(id) => <Input id={id} value={lic.allowedDomains} onChange={(e) => setLic({ ...lic, allowedDomains: e.target.value })} placeholder="example.com, *.example.com" />}
             </Field>
             <Field label="Expires">{(id) => <Input id={id} type="date" value={lic.expiresAt} onChange={(e) => setLic({ ...lic, expiresAt: e.target.value })} />}</Field>
             <Field label="Licence document URL">{(id) => <Input id={id} value={lic.documentUrl} onChange={(e) => setLic({ ...lic, documentUrl: e.target.value })} />}</Field>

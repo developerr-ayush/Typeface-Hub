@@ -1,4 +1,4 @@
-/** Parse @font-face rules from a stylesheet (SRC-5 custom URLs, SRC-7 legacy FanXP CSS). */
+/** Parse @font-face rules from a stylesheet (custom stylesheet URLs and legacy CSS imports). */
 
 export interface ParsedSource {
   url: string;

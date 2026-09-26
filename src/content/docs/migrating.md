@@ -1,13 +1,13 @@
 ---
 title: Migrating existing fonts
-description: Import fonts from existing CSS, such as FanXP or Transfonter exports.
+description: Import fonts from existing CSS, such as Transfonter exports.
 ---
 
 # Migrating existing fonts
 
 If your fonts already live somewhere as a CSS file plus font files, you can import them without re-uploading anything by hand.
 
-## From stored CSS (FanXP, Transfonter)
+## From stored CSS (Transfonter and similar)
 
 1. Open **Add font → Stylesheet & legacy import** and choose **Paste CSS (legacy import)**.
 2. Paste the CSS. Typical Transfonter output lists EOT, WOFF2, WOFF, TTF and SVG for each weight; that's fine.

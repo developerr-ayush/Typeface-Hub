@@ -32,7 +32,7 @@ export function NewWorkspaceForm() {
         <p className="mt-1 text-sm text-muted">Each workspace has its own private font library, tokens and API keys.</p>
       </div>
       {error && <Alert tone="bad">{error}</Alert>}
-      <Field label="Workspace name">{(id) => <Input id={id} name="name" required minLength={2} autoFocus placeholder="Washington Freedom" />}</Field>
+      <Field label="Workspace name">{(id) => <Input id={id} name="name" required minLength={2} autoFocus placeholder="Acme Studio" />}</Field>
       <Button type="submit" variant="primary" className="w-full" loading={loading}>
         Create workspace
       </Button>

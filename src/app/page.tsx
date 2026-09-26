@@ -5,7 +5,7 @@ import { getUser } from '@/lib/auth';
 import { listUserWorkspaces } from '@/lib/context';
 
 const features: [string, string, string][] = [
-  ['Every source, one library', 'Upload TTF, OTF, WOFF, WOFF2 or a ZIP, pick from 1,900 Google Fonts, or import a stylesheet or old FanXP / Transfonter CSS. Everything lands in one searchable library.', 'M4 7h16M4 12h16M4 17h10'],
+  ['Every source, one library', 'Upload TTF, OTF, WOFF, WOFF2 or a ZIP, pick from 1,900 Google Fonts, or import a stylesheet or an old Transfonter export. Everything lands in one searchable library.', 'M4 7h16M4 12h16M4 17h10'],
   ['Zero manual conversion', 'Files are validated, converted to WOFF2 and WOFF, split by script with unicode-range, and given content-hashed names. A report shows the bytes saved.', 'M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4'],
   ['Variable fonts, properly', 'Axes and named instances are detected. Cap or pin any axis (weight, width, optical size, slant) to cut file size, or export static weights with correct names.', 'M4 18c4 0 4-12 8-12s4 12 8 12'],
   ['A Google-style CSS API', 'One stylesheet per page, with only the families, weights and scripts it renders, plus metric-matched fallback fonts that stop layout shift.', 'm8 8-4 4 4 4M16 8l4 4-4 4'],
