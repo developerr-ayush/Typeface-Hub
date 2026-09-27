@@ -1,7 +1,7 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { getApiActor } from '@/lib/context';
 import { badRequest, handler, json, readJson } from '@/lib/http';
-import { MAX_FILE_BYTES } from '@/lib/uploads';
+import { isUploadKey, MAX_FILE_BYTES } from '@/lib/uploads';
 
 /** Issues client-upload tokens so large font files go directly from the browser to Vercel Blob. */
 export const POST = handler(async (req) => {
@@ -12,7 +12,7 @@ export const POST = handler(async (req) => {
     onBeforeGenerateToken: async (pathname) => {
       const actor = await getApiActor(req);
       actor.assert('upload');
-      if (!pathname.startsWith(`uploads/${actor.workspace.id}/`)) throw badRequest('Invalid upload path.');
+      if (!isUploadKey(pathname, actor.workspace.id)) throw badRequest('Invalid upload path.');
       return {
         maximumSizeInBytes: MAX_FILE_BYTES,
         addRandomSuffix: true,

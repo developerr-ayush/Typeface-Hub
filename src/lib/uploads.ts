@@ -17,15 +17,30 @@ export interface UploadRef {
   filename: string;
 }
 
+const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+// One path segment of a stored file name: the characters storeUpload and the client keep, never "." or "..".
+const NAME = String.raw`(?!\.+$)[\w.\-()[\] ]{1,200}`;
+
+/** Upload keys look like "uploads/<workspace id>/<uuid>/<file name>" (no "..", no extra segments). */
+export function isUploadKey(key: string, workspaceId: string) {
+  return new RegExp(`^uploads/${workspaceId}/${UUID}/${NAME}$`, 'i').test(key);
+}
+
 export function assertUploadRef(ref: UploadRef, workspaceId: string) {
-  if (ref.key.startsWith('https://')) {
-    const url = new URL(ref.key);
-    if (!url.hostname.endsWith('.blob.vercel-storage.com') || !url.pathname.startsWith(`/uploads/${workspaceId}/`)) {
+  let key = ref.key;
+  if (key.startsWith('https://')) {
+    let url: URL;
+    try {
+      url = new URL(key);
+      key = decodeURIComponent(url.pathname.slice(1));
+    } catch {
       throw badRequest(`Upload “${ref.filename}” does not belong to this workspace.`);
     }
-  } else if (!ref.key.startsWith(`uploads/${workspaceId}/`)) {
-    throw badRequest(`Upload “${ref.filename}” does not belong to this workspace.`);
+    if (url.protocol !== 'https:' || !url.hostname.endsWith('.blob.vercel-storage.com') || url.search || url.hash) {
+      throw badRequest(`Upload “${ref.filename}” does not belong to this workspace.`);
+    }
   }
+  if (!isUploadKey(key, workspaceId)) throw badRequest(`Upload “${ref.filename}” does not belong to this workspace.`);
 }
 
 export async function readUpload(ref: UploadRef) {
@@ -35,7 +50,8 @@ export async function readUpload(ref: UploadRef) {
 }
 
 export async function storeUpload(workspaceId: string, filename: string, body: Buffer): Promise<UploadRef> {
-  const safe = filename.replace(/[^\w.\-()[\] ]+/g, '_').slice(-120);
+  const cleaned = filename.replace(/[^\w.\-()[\] ]+/g, '_').slice(-120);
+  const safe = /^\.*$/.test(cleaned) ? 'font' : cleaned;
   const key = `uploads/${workspaceId}/${randomUUID()}/${safe}`;
   await putObject(key, body, 'application/octet-stream');
   return { key, filename };

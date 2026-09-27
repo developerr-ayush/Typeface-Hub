@@ -1,6 +1,6 @@
 import 'server-only';
 import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
-import { dirname, join, normalize } from 'node:path';
+import { dirname, join, normalize, sep } from 'node:path';
 
 /**
  * File storage. Uses Vercel Blob when BLOB_READ_WRITE_TOKEN is set, otherwise
@@ -21,8 +21,12 @@ const privateToken = () => process.env.BLOB_PRIVATE_READ_WRITE_TOKEN!;
 const LOCAL_ROOT = join(process.cwd(), '.data', 'storage');
 
 function localPath(key: string) {
+  // Keys are relative paths made of plain segments; "..", "." and empty segments are never valid.
+  if (!key || key.startsWith('/') || key.includes('\\') || key.includes('\0') || key.split('/').some((s) => s === '' || s === '.' || s === '..')) {
+    throw new Error('Invalid storage key');
+  }
   const path = normalize(join(LOCAL_ROOT, key));
-  if (!path.startsWith(LOCAL_ROOT)) throw new Error('Invalid storage key');
+  if (!path.startsWith(LOCAL_ROOT + sep)) throw new Error('Invalid storage key');
   return path;
 }
 

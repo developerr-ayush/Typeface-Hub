@@ -1,37 +1,107 @@
 import 'server-only';
-import { lookup } from 'node:dns/promises';
-import { isIP } from 'node:net';
+import { lookup as dnsLookup, type LookupAddress } from 'node:dns';
+import { BlockList, isIP } from 'node:net';
+import { Agent, fetch, type RequestInit, type Response } from 'undici';
 
 const MAX_BYTES = 25 * 1024 * 1024;
+const MAX_REDIRECTS = 5;
 
-function isPrivate(ip: string) {
-  if (ip.includes(':')) {
-    const v = ip.toLowerCase();
-    return v === '::1' || v.startsWith('fc') || v.startsWith('fd') || v.startsWith('fe80') || v === '::' || v.startsWith('::ffff:127.') || v.startsWith('::ffff:10.') || v.startsWith('::ffff:192.168.');
-  }
-  const [a, b] = ip.split('.').map(Number);
-  return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127);
+// Addresses a user-supplied URL may never reach. BlockList also matches IPv4-mapped
+// IPv6 forms (::ffff:127.0.0.1, ::ffff:7f00:1) against the IPv4 rules.
+const blocked = new BlockList();
+for (const [net, prefix] of [
+  ['0.0.0.0', 8],
+  ['10.0.0.0', 8],
+  ['100.64.0.0', 10],
+  ['127.0.0.0', 8],
+  ['169.254.0.0', 16],
+  ['172.16.0.0', 12],
+  ['192.0.0.0', 24],
+  ['192.168.0.0', 16],
+  ['198.18.0.0', 15],
+  ['224.0.0.0', 4],
+  ['240.0.0.0', 4],
+] as const) blocked.addSubnet(net, prefix, 'ipv4');
+for (const [net, prefix] of [
+  ['::', 128],
+  ['::1', 128],
+  ['::', 96], // IPv4-compatible (deprecated)
+  ['64:ff9b::', 96], // NAT64
+  ['fc00::', 7],
+  ['fe80::', 10],
+  ['ff00::', 8],
+] as const) blocked.addSubnet(net, prefix, 'ipv6');
+
+/** True when the address is loopback, private, link-local or otherwise not a public internet address. */
+export function isPrivateAddress(ip: string) {
+  const family = isIP(ip);
+  if (!family) return true;
+  return blocked.check(ip, family === 4 ? 'ipv4' : 'ipv6');
 }
 
-/** Fetch a user-supplied URL, refusing private network addresses (SSRF protection). */
-export async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
-  let parsed: URL;
+// Checks are skipped outside production so local development can fetch from localhost.
+const enforce = () => process.env.NODE_ENV === 'production';
+
+/**
+ * DNS lookup used for every connection: the addresses are checked at connect time,
+ * so a hostname can't pass the check and then resolve to a private address (DNS rebinding).
+ */
+function guardedLookup(hostname: string, options: { all?: boolean; family?: number } & Record<string, unknown>, callback: (err: NodeJS.ErrnoException | null, address: string | LookupAddress[], family?: number) => void) {
+  dnsLookup(hostname, { ...options, all: true }, (err, addresses) => {
+    if (err) return callback(err, options.all ? [] : '');
+    const list = addresses as LookupAddress[];
+    if (enforce() && (!list.length || list.some((a) => isPrivateAddress(a.address)))) {
+      return callback(Object.assign(new Error(`${hostname} points to a private network address and cannot be fetched.`), { code: 'EPRIVATE' }), options.all ? [] : '');
+    }
+    if (options.all) callback(null, list);
+    else callback(null, list[0].address, list[0].family);
+  });
+}
+
+const dispatcher = new Agent({ connect: { lookup: guardedLookup as never } });
+
+function checkUrl(raw: string | URL): URL {
+  let url: URL;
   try {
-    parsed = new URL(url);
+    url = new URL(raw);
   } catch {
-    throw new Error(`“${url}” is not a valid URL.`);
+    throw new Error(`“${String(raw)}” is not a valid URL.`);
   }
-  if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Only http and https URLs are allowed.');
-  const host = parsed.hostname.replace(/^\[|\]$/g, '');
-  const addresses = isIP(host) ? [{ address: host }] : await lookup(host, { all: true }).catch(() => []);
-  if (!addresses.length) throw new Error(`Could not resolve ${host}.`);
-  if (process.env.NODE_ENV === 'production' && addresses.some((a) => isPrivate(a.address))) {
-    throw new Error(`${host} points to a private network address and cannot be fetched.`);
+  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Only http and https URLs are allowed.');
+  if (url.username || url.password) throw new Error('URLs with credentials are not allowed.');
+  const host = url.hostname.replace(/^\[|\]$/g, '');
+  // IP literals skip DNS, so check them here; hostnames are checked in guardedLookup.
+  if (enforce() && isIP(host) && isPrivateAddress(host)) throw new Error(`${host} is a private network address and cannot be fetched.`);
+  return url;
+}
+
+/**
+ * Fetch a user-supplied URL, refusing private network addresses (SSRF protection).
+ * Redirects are followed manually so every hop is checked again.
+ */
+export async function safeFetch(url: string, init: RequestInit = {}): Promise<Response> {
+  const signal = AbortSignal.timeout(30_000);
+  let current = checkUrl(url);
+  for (let hop = 0; ; hop++) {
+    let res: Response;
+    try {
+      res = await fetch(current, { ...init, redirect: 'manual', signal, dispatcher });
+    } catch (e) {
+      const cause = (e as { cause?: { code?: string; message?: string } }).cause;
+      if (cause?.code === 'EPRIVATE') throw new Error(cause.message);
+      throw e;
+    }
+    const location = res.headers.get('location');
+    if (res.status >= 300 && res.status < 400 && location) {
+      await res.body?.cancel().catch(() => {});
+      if (hop >= MAX_REDIRECTS) throw new Error(`${url} redirected too many times.`);
+      current = checkUrl(new URL(location, current));
+      continue;
+    }
+    const len = Number(res.headers.get('content-length') ?? 0);
+    if (len > MAX_BYTES) throw new Error(`${url} is larger than 25 MB.`);
+    return res;
   }
-  const res = await fetch(parsed, { ...init, redirect: 'follow', cache: 'no-store', signal: AbortSignal.timeout(30_000) });
-  const len = Number(res.headers.get('content-length') ?? 0);
-  if (len > MAX_BYTES) throw new Error(`${url} is larger than 25 MB.`);
-  return res;
 }
 
 export async function safeFetchBuffer(url: string) {
