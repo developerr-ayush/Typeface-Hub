@@ -20,6 +20,8 @@ updated: 26 September 2026
 
 **Free converter.** Files you convert are processed in memory. When the service runs on Vercel, uploads are placed in temporary storage and deleted right after conversion; anything left behind is removed within an hour. For rate limiting we store a one-way hash of your network address and a counter, which expire within the hour.
 
+**Icon font generator.** On the public page, your icon selection is saved only in your browser's local storage. SVGs are converted in your browser; configs you open and fonts you build are processed in memory and not kept. In a workspace, icon fonts are stored with the workspace like other content.
+
 ## Cookies
 
 We set one cookie, `th_session`, to keep you signed in. It is HTTP-only and expires after 30 days. We don't use advertising or tracking cookies.

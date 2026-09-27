@@ -100,6 +100,17 @@ curl -s -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
 | GET | `/audit` | Audit log: `before`, `target`, `limit` |
 | GET | `/stats` | CSS API and pipeline metrics |
 
+## Icon fonts
+
+A config has `name`, `prefix`, `suffix` and `glyphs`. Each glyph has a `uid`, a class name `css`, a `code` point and its source set `src`. Icons from the bundled sets need only these (`uid` as returned by `/api/icons/search`); uploaded icons use `src: "custom"` and carry their outline in `d` (an SVG path scaled to 1000 units high) and `width`. See [Icon fonts](/docs/icon-fonts).
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET / POST | `/icon-fonts` | List icon fonts; create one from a config (`edit`) |
+| GET / PUT / DELETE | `/icon-fonts/{id}` | Read, replace the config (`edit`), delete (`delete`) |
+| POST | `/icon-fonts/{id}/publish` | Build and serve at `/fonts/{workspace}/icons/{slug}.css` (`publish`) |
+| GET | `/icon-fonts/{id}/kit` | Download the saved font as a ZIP |
+
 ## Public endpoints (no key)
 
 | Method | Path | Purpose |
@@ -109,3 +120,8 @@ curl -s -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
 | GET | `/fonts/files/{name}` | Font files |
 | POST | `/api/convert/inspect` | Converter: read uploaded fonts |
 | POST | `/api/convert` | Converter: build a kit |
+| GET | `/fonts/{workspace}/icons/{slug}.css` | Stylesheet of a published icon font |
+| GET | `/api/icons/sets` | Bundled icon sets and their licences |
+| GET | `/api/icons/search` | Search icons: `q`, `set`, `offset`, `limit` (max 300) |
+| POST | `/api/icons/import` | Read a Fontello `config.json` or ZIP (multipart field `file`) |
+| POST | `/api/icons/build` | Build an icon font from a config (JSON) and return the ZIP |

@@ -20,6 +20,7 @@ export const DOCS_NAV: { title: string; items: { slug: string; title: string }[]
       { slug: 'server-rendering', title: 'SDUI and server rendering' },
       { slug: 'download-kits', title: 'Download kits' },
       { slug: 'converter', title: 'Free converter' },
+      { slug: 'icon-fonts', title: 'Icon fonts' },
       { slug: 'migrating', title: 'Migrating existing fonts' },
       { slug: 'workspaces-and-roles', title: 'Workspaces and roles' },
       { slug: 'licensing', title: 'Licensing' },

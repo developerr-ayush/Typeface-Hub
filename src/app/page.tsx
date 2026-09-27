@@ -138,9 +138,15 @@ export default async function Home() {
               <p className="mt-2 text-sm leading-relaxed text-muted">
                 The free converter turns any font into a web font kit: WOFF2, WOFF and TTF files, a ready-made stylesheet and a demo page with the CSS for every combination. No account, and files aren&apos;t kept.
               </p>
-              <Link href="/convert" className="mt-6 inline-flex rounded-lg border border-line-strong px-4 py-2.5 text-sm font-semibold text-ink hover:bg-canvas">
-                Open the converter
-              </Link>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <Link href="/convert" className="inline-flex rounded-lg border border-line-strong px-4 py-2.5 text-sm font-semibold text-ink hover:bg-canvas">
+                  Open the converter
+                </Link>
+                <Link href="/icons" className="inline-flex rounded-lg border border-line-strong px-4 py-2.5 text-sm font-semibold text-ink hover:bg-canvas">
+                  Make an icon font
+                </Link>
+              </div>
+              <p className="mt-3 text-xs text-muted">The icon font generator builds a font from 11,000+ open-source icons or your own SVGs, and opens Fontello configs.</p>
             </div>
             <div className="rounded-2xl border border-ink bg-ink p-8 text-white">
               <h2 className="text-xl font-semibold">Running many sites?</h2>

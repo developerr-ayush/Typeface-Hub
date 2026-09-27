@@ -26,6 +26,16 @@ A typical 4-weight static family processes in under 10 seconds; a single variabl
 | Conversions | 30 per hour per network |
 | File inspections | 120 per hour per network |
 
+## Icon fonts
+
+| Limit | Value |
+| --- | --- |
+| Icons per font | 2,000 |
+| Size per SVG | 1 MB |
+| Config or ZIP to open | 4 MB |
+| Fonts built on /icons | 60 per hour per network |
+| Configs opened | 120 per hour per network |
+
 ## Caching
 
 | Resource | Browser | CDN | Notes |
@@ -34,6 +44,7 @@ A typical 4-weight static family processes in under 10 seconds; a single variabl
 | Font files | 1 year, immutable | 1 year | Content-hashed names; a new version gets new URLs |
 | Token stylesheet | 5 minutes | 1 minute, stale-while-revalidate | |
 | Kits | | | Cached per version and options in storage |
+| Icon font stylesheet | 10 minutes | 5 minutes, then stale-while-revalidate for 1 day | Files have content-hashed names |
 
 ## Monitoring
 

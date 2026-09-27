@@ -322,3 +322,33 @@ export const rateLimits = pgTable('rate_limits', {
   count: integer('count').notNull().default(0),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
 });
+
+export interface PublishedIconFont {
+  hash: string;
+  woff2: string; // file names under files/
+  woff: string;
+  glyphs: number;
+  bytes: number; // WOFF2 size
+  publishedAt: string;
+  // What the live stylesheet describes (the saved config may have moved on since).
+  name: string;
+  prefix: string;
+  suffix: boolean;
+  codes: { css: string; code: number }[];
+}
+
+// Icon fonts: a Fontello-style config (icons, names, code points) and its last published build.
+export const iconFonts = pgTable(
+  'icon_fonts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    workspaceId: uuid('workspace_id').notNull().references(() => workspaces.id, { onDelete: 'cascade' }),
+    slug: text('slug').notNull(),
+    config: jsonb('config').$type<import('../icons/config').IconFontConfig>().notNull(),
+    published: jsonb('published').$type<PublishedIconFont | null>(),
+    createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('icon_fonts_ws_slug').on(t.workspaceId, t.slug)],
+);

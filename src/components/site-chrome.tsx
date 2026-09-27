@@ -4,6 +4,7 @@ import { Logo } from './logo';
 const nav = [
   { href: '/#features', label: 'Product' },
   { href: '/convert', label: 'Converter' },
+  { href: '/icons', label: 'Icons' },
   { href: '/docs', label: 'Docs' },
   { href: '/about', label: 'About' },
 ];
@@ -56,7 +57,7 @@ export function SiteHeader({ user, active }: { user?: { name: string } | null; a
 }
 
 const footer = [
-  { title: 'Product', links: [['Features', '/#features'], ['Free converter', '/convert'], ['Sign up', '/signup'], ['Changelog', '/changelog']] },
+  { title: 'Product', links: [['Features', '/#features'], ['Free converter', '/convert'], ['Icon fonts', '/icons'], ['Sign up', '/signup'], ['Changelog', '/changelog']] },
   { title: 'Docs', links: [['Introduction', '/docs'], ['Quick start', '/docs/quick-start'], ['CSS API', '/docs/css-api'], ['REST API', '/docs/rest-api']] },
   { title: 'Company', links: [['About', '/about'], ['Privacy', '/privacy'], ['Terms', '/terms'], ['GitHub', 'https://github.com/developerr-ayush/Typeface-Hub']] },
 ];

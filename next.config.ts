@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   // Font processing relies on WASM (HarfBuzz, WOFF2) loaded from node_modules at runtime.
   serverExternalPackages: ['subset-font', 'harfbuzzjs', 'fontverter', 'wawoff2', 'fontkit'],
   outputFileTracingIncludes: {
-    '/api/**/*': ['./node_modules/harfbuzzjs/dist/*.wasm'],
+    '/api/**/*': ['./node_modules/harfbuzzjs/dist/*.wasm', './src/data/icons/*.json'],
     '/docs/**/*': ['./src/content/**/*.md'],
     '/(about|privacy|terms|changelog)': ['./src/content/**/*.md'],
   },

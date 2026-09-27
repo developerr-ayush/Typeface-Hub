@@ -23,6 +23,8 @@ COPY --from=build /app/drizzle ./drizzle
 COPY --from=build /app/scripts ./scripts
 # Markdown for /docs, /about, /privacy, /terms and /changelog is read at runtime.
 COPY --from=build /app/src/content ./src/content
+# Icon sets for the icon font editor are also read at runtime.
+COPY --from=build /app/src/data/icons ./src/data/icons
 COPY --from=build /app/next.config.ts ./next.config.ts
 RUN mkdir -p /app/.data && chown -R node:node /app/.data
 USER node

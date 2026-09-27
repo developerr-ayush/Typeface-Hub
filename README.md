@@ -20,6 +20,7 @@ Built with Next.js 16 (App Router), Postgres (Drizzle ORM), Vercel Blob, HarfBuz
 | **Governance** | Every upload of an existing family becomes a new **draft version**; review screen with editable faces, side-by-side compare, publish, one-click **rollback**, licence records and confirmation, archive with in-use protection, roles (Viewer, Editor, Publisher, Admin), multi-tenant workspaces and a full **audit log**. |
 | **Download kit** | On any family, download a ZIP with the fonts in WOFF2, WOFF and TTF/OTF, a ready-made stylesheet, a metric-matched fallback, optional typography tokens, a `demo.html` (a playground with a slider per axis, every combination of the kit's variants and its named instances, each with the CSS to copy) and a README. Options cover faces, character sets (Latin, Latin + Extended, split by script, full, or custom characters), static weights cut from variable fonts, the font path and `font-display`. Also available as `POST /api/v1/families/{id}/kit`. |
 | **Free converter** | A public page at `/convert`, no account needed: upload TTF / OTF / WOFF / WOFF2 or a ZIP, see right away which files are variable or static and which axes they have, try the font live with sliders, limit or pin any axis (weight, width, optical size, slant, custom), pick formats and characters, and download the same kind of kit. Nothing is stored; uploads are deleted after conversion. Rate limited to 30 conversions per hour per network, 12 files of up to 15 MB each. |
+| **Icon fonts** | A Fontello-style generator at `/icons` (free, no account) and in every workspace: pick from 11,000+ icons in 16 open-source sets (Fontello's built-in sets, Material Design Icons, Bootstrap Icons) or upload SVGs (shapes, transforms and even-odd holes handled; strokes flagged), set class names and code points, and download WOFF2 + WOFF + TTF with CSS, a demo page, LICENSE.txt and a `config.json`. Opens and exports Fontello configs. Workspaces can publish an icon font to `/fonts/{workspace}/icons/{slug}.css`. |
 | **Developers** | REST API under `/api/v1` with workspace **API keys** (delivery / read / write / publish scopes), CSS API, token stylesheet, SDUI endpoint. See the **Developers** page in the app. |
 | **Monitoring** | CSS API latency (p50/p95 histogram), error rate and most-requested families; pipeline success rate, durations and failure reasons. |
 
@@ -80,6 +81,7 @@ npm run lint                # TypeScript type-check
 npm run build               # migrate + production build
 npm run db:generate         # new SQL migration after editing src/lib/db/schema.ts
 npm run catalog:build       # refresh the bundled Google Fonts catalogue and subset ranges
+npm run icons:build         # rebuild the bundled icon sets in src/data/icons
 ```
 
 ## Using the fonts on a site
@@ -137,6 +139,7 @@ src/lib/
   jobs.ts                 processing pipeline (upload, Google import, CSS import, axis limits)
   families.ts             library, versions, publish, rollback, archive
   tokens.ts, typography.ts typography tokens, CSS/JSON output, SDUI
+  icons/                  icon fonts: SVG to glyph, bundled sets, font builder, Fontello import
   db/schema.ts            Drizzle schema (migrations in ./drizzle)
 tests/                    unit tests
 ```

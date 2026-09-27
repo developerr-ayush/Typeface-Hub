@@ -72,6 +72,7 @@ DATABASE_URL=postgres://typeface:typeface@localhost:5432/typeface_hub
 | `npm run build` | Run migrations, then a production build |
 | `npm run db:generate` | Create a migration after editing `src/lib/db/schema.ts` |
 | `npm run catalog:build` | Refresh the bundled Google Fonts catalogue |
+| `npm run icons:build` | Rebuild the bundled icon sets (`src/data/icons`) |
 
 ## Troubleshooting
 

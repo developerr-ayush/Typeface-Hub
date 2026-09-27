@@ -7,6 +7,14 @@ description: What's new in Typeface Hub.
 
 ## September 2026
 
+### Icon fonts
+
+- A new icon font generator at [/icons](/icons), free and without an account: pick from more than 11,000 icons in 16 open-source sets (Font Awesome, Material Design Icons, Bootstrap Icons, Entypo, Typicons and more) or upload your own SVGs.
+- Downloads include WOFF2, WOFF and TTF files, a stylesheet with one class per icon, an embedded variant, a searchable demo page, a licence list and a `config.json`.
+- Opens Fontello `config.json` files and ZIPs, and exports configs that open in Fontello.
+- SVG uploads handle shapes, groups and transforms, and convert even-odd holes automatically; outline-only (stroke) icons are flagged.
+- Workspaces get **Icon fonts**: save, publish to a stylesheet link and manage them with the REST API.
+
 ### Security and reliability
 
 - Sign-in, sign-up and password reset are rate limited per network and per account, with a global safety limit.
