@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { strToU8, zipSync, type Zippable } from 'fflate';
 import subsetFont from 'subset-font';
 import { fallbackRule } from './css-api';
+import { cssQuote } from './css-names';
 import type { schema } from './db';
 import { FontError, readFont } from './fonts/metadata';
 import { renameFont, styleNames } from './fonts/names';
@@ -88,7 +89,7 @@ const toText = (cps: number[]) => {
   for (let i = 0; i < cps.length; i += 8192) out += String.fromCodePoint(...cps.slice(i, i + 8192));
   return out;
 };
-const q = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+const q = cssQuote;
 
 function chunksFor(characterSet: number[], opts: KitOptions): Chunk[] {
   const latin = SUBSETS.find((s) => s.name === 'latin')!;

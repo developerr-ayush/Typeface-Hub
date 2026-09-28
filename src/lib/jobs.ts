@@ -9,6 +9,7 @@ import type { ExternalConfig, FamilySource, JobKind, Licence, VersionReport } fr
 import { defaultFallbackStack, FontError, guessCategory, MIME, readFont } from './fonts/metadata';
 import { buildFace, faceSlugFor, instanceFont, sha256, slugify, type AxisLimits } from './fonts/process';
 import { fetchGoogleMasters, findGoogle, googleLicenceType, type GoogleSelection } from './google';
+import { cleanCssName } from './css-names';
 import { safeFetchBuffer, safeFetchText } from './safe-fetch';
 import { getObject, putObject } from './storage';
 import { discardUploads, readUpload, type UploadRef } from './uploads';
@@ -241,7 +242,8 @@ async function uniqueSlug(workspaceId: string, base: string) {
   for (let i = 2; ; i++) if (!taken.has(`${base}-${i}`)) return `${base}-${i}`;
 }
 
-async function ingest(ctx: JobContext, group: IngestGroup) {
+async function ingest(ctx: JobContext, input: IngestGroup) {
+  const group = { ...input, familyName: cleanCssName(input.familyName) };
   const { job } = ctx;
   const started = Date.now();
   const warnings: string[] = [];

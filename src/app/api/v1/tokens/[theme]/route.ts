@@ -9,7 +9,7 @@ type Ctx = { params: Promise<{ theme: string }> };
 /** Typography tokens (TYP-1, TYP-2, TYP-5, TYP-8). ?format=css|json|raw */
 export const GET = handler<Ctx>(async (req, { params }) => {
   const actor = await getApiActor(req);
-  actor.assert('read');
+  actor.assert('deliver');
   const theme = (await params).theme;
   const format = new URL(req.url).searchParams.get('format') ?? 'raw';
   const set = await getTokenSet(actor.workspace.id, theme);

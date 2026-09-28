@@ -47,6 +47,25 @@ export async function loadPublishedFamilies(workspaceId: string, names?: string[
   return map;
 }
 
+/**
+ * The site's origin from configuration only (never from request headers):
+ * NEXT_PUBLIC_APP_URL, or the URL Vercel assigns to the deployment.
+ */
+export function configuredOrigin() {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
+  if (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return null;
+}
+
+/**
+ * Origin for links sent by email (password resets). Host and X-Forwarded-Host
+ * can be set by the client, so they are only trusted outside production.
+ */
+export function trustedOrigin(req: Request) {
+  return configuredOrigin() ?? (process.env.NODE_ENV === 'production' ? null : appOrigin(req));
+}
+
 export function appOrigin(req?: Request) {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
   if (req) {

@@ -4,6 +4,7 @@ export const ROLES: Role[] = ['viewer', 'editor', 'publisher', 'admin'];
 const rank: Record<Role, number> = { viewer: 0, editor: 1, publisher: 2, admin: 3 };
 
 export type Permission =
+  | 'deliver' // SDUI and published typography tokens (what a site needs at build or render time)
   | 'read'
   | 'upload' // add fonts, create drafts
   | 'edit' // edit family metadata, faces in draft, tokens
@@ -14,6 +15,7 @@ export type Permission =
   ;
 
 const minimum: Record<Permission, Role> = {
+  deliver: 'viewer',
   read: 'viewer',
   upload: 'editor',
   edit: 'editor',
@@ -24,10 +26,11 @@ const minimum: Record<Permission, Role> = {
 };
 
 const scopeGrants: Record<ApiScope, Permission[]> = {
-  delivery: ['read'],
-  read: ['read'],
-  write: ['read', 'upload', 'edit'],
-  publish: ['read', 'upload', 'edit', 'publish'],
+  // Delivery keys live in build pipelines and render servers, so they only get what a site needs.
+  delivery: ['deliver'],
+  read: ['deliver', 'read'],
+  write: ['deliver', 'read', 'upload', 'edit'],
+  publish: ['deliver', 'read', 'upload', 'edit', 'publish'],
 };
 
 export function roleCan(role: Role, permission: Permission) {

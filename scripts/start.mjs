@@ -20,6 +20,10 @@ if (current.length < 32 || WEAK.includes(current)) {
   if (current) console.warn('[start] The AUTH_SECRET you set is too weak; using the generated one instead.');
 }
 
+if (!process.env.NEXT_PUBLIC_APP_URL) {
+  console.warn('[start] NEXT_PUBLIC_APP_URL is not set. Set it to the public URL (for example https://fonts.example.com) so password reset emails can be sent.');
+}
+
 await import('./migrate.mjs');
 
 const child = spawn(join(process.cwd(), 'node_modules/.bin/next'), ['start'], { stdio: 'inherit', env: process.env });

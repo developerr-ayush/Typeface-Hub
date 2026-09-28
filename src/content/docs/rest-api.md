@@ -12,10 +12,10 @@ All endpoints live under `/api/v1` and return JSON.
 Send an API key as a bearer token:
 
 ```bash
-curl https://fonts.example.com/api/v1/families -H "Authorization: Bearer th_live_…"
+curl https://fonts.example.com/api/v1/families -H "Authorization: Bearer th_mgmt_…"
 ```
 
-Keys belong to one workspace, so no workspace parameter is needed. Create keys in **Developers → API keys**; see [scopes](/docs/workspaces-and-roles#api-keys).
+Keys belong to one workspace, so no workspace parameter is needed. Create keys in **Developers → API keys**; see [scopes](/docs/workspaces-and-roles#api-keys). Delivery keys (`th_live_…`) only work for `/sdui` and `/tokens/{theme}`; the other endpoints need a management key (`th_mgmt_…`) with the `read` scope or higher.
 
 In the browser, the app uses the session cookie plus an `X-Workspace: {slug}` header.
 

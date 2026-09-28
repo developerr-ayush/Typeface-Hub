@@ -35,7 +35,7 @@ Admins create keys in **Developers → API keys**. Each key belongs to one works
 
 | Scope | Allows |
 | --- | --- |
-| `delivery` | Read published fonts, tokens and SDUI. Safe for build pipelines. |
+| `delivery` | Only the SDUI endpoint and typography tokens (`GET /sdui`, `GET /tokens/{theme}`), using published fonts. Safe for build pipelines and render servers. |
 | `read` | Read everything in the management API |
 | `write` | Add fonts, edit drafts, families and tokens |
 | `publish` | Publish, roll back and archive |

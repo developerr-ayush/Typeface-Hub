@@ -118,7 +118,7 @@ export async function listApiKeys(workspaceId: string) {
 
 export async function createApiKey(actor: Actor, name: string, scopes: ApiScope[]) {
   if (!scopes.length) throw badRequest('Pick at least one scope.');
-  const token = `th_${scopes.includes('write') || scopes.includes('publish') ? 'mgmt' : 'live'}_${randomBytes(24).toString('base64url')}`;
+  const token = `th_${scopes.some((s) => s !== 'delivery') ? 'mgmt' : 'live'}_${randomBytes(24).toString('base64url')}`;
   const [key] = await db
     .insert(schema.apiKeys)
     .values({ workspaceId: actor.workspace.id, name: name.trim() || 'API key', prefix: token.slice(0, 12), hash: hashKey(token), scopes, createdBy: actor.id })

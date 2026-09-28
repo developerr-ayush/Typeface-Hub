@@ -75,3 +75,38 @@ describe('upload keys', () => {
     expect(await getObject('../package.json')).toBeNull();
   });
 });
+
+describe('CSS names', () => {
+  it('cleans names that could break out of generated CSS', async () => {
+    const { cleanCssName, cssQuote } = await import('@/lib/css-names');
+    expect(cleanCssName("Evil'}\nbody{background:url(//x)}")).toBe('Evil body background:url(//x)');
+    expect(cleanCssName('  Brand   Sans  ')).toBe('Brand Sans');
+    expect(cleanCssName('\n;')).toBe('Font');
+    expect(cssQuote("It's \\ ok\n</style>")).toBe("'It\\'s \\\\ ok\\a \\3c /style\\3e '");
+  });
+});
+
+describe('password reset origin', () => {
+  afterEach(() => vi.unstubAllEnvs());
+  const req = new Request('http://real.example/api/auth/forgot', { headers: { 'x-forwarded-host': 'attacker.example' } });
+
+  it('never uses request headers in production', async () => {
+    const { trustedOrigin } = await import('@/lib/delivery');
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
+    vi.stubEnv('VERCEL_URL', '');
+    expect(trustedOrigin(req)).toBeNull();
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://fonts.example.com/');
+    expect(trustedOrigin(req)).toBe('https://fonts.example.com');
+  });
+});
+
+describe('API key scopes', () => {
+  it('limits delivery keys to SDUI and tokens', async () => {
+    const { scopesCan } = await import('@/lib/permissions');
+    expect(scopesCan(['delivery'], 'deliver')).toBe(true);
+    expect(scopesCan(['delivery'], 'read')).toBe(false);
+    expect(scopesCan(['read'], 'deliver')).toBe(true);
+    expect(scopesCan(['read'], 'read')).toBe(true);
+  });
+});

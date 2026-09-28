@@ -15,7 +15,7 @@ interface Key {
 }
 
 const SCOPES: [string, string][] = [
-  ['delivery', 'Delivery: read published fonts, tokens and SDUI'],
+  ['delivery', 'Delivery: SDUI and published typography tokens only'],
   ['read', 'Read: everything in the management API'],
   ['write', 'Write: add fonts, edit drafts, families and tokens'],
   ['publish', 'Publish: publish, roll back and archive'],
@@ -48,7 +48,7 @@ export function ApiKeys({ ws, initial }: { ws: string; initial: Key[] }) {
     <Card>
       <CardHeader
         title="API keys"
-        description="Delivery keys are read-only and safe for build pipelines; management keys can change the library."
+        description="Delivery keys can only read the SDUI endpoint and published typography tokens, so they are safe for build pipelines and render servers. Management keys can read or change the library."
         actions={
           <Button
             variant="primary"

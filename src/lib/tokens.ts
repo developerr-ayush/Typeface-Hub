@@ -1,4 +1,5 @@
 import type { Breakpoints, RoleToken, TextStyle } from './db/schema';
+import { cssQuote } from './css-names';
 
 export const DEFAULT_ROLES: Record<string, RoleToken> = {
   heading: { familyId: null },
@@ -52,7 +53,7 @@ export interface TokenInput {
 
 export type FamilyLookup = Map<string, { cssName: string; fallbackStack: string[]; hasFallbackFace: boolean; delivery: string }>;
 
-const q = (s: string) => (/^[a-z-]+$/i.test(s) && !/\s/.test(s) ? s : `'${s.replace(/'/g, "\\'")}'`);
+const q = (s: string) => (/^[a-z-]+$/i.test(s) ? s : cssQuote(s));
 const GENERIC = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-sans-serif', 'ui-serif', 'ui-monospace', 'ui-rounded', 'emoji', 'math']);
 const fam = (s: string) => (GENERIC.has(s) || s.startsWith('-apple') ? s : q(s));
 

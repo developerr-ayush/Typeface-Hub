@@ -1,3 +1,4 @@
+import { cleanCssName } from './css-names';
 /** Parse @font-face rules from a stylesheet (custom stylesheet URLs and legacy CSS imports). */
 
 export interface ParsedSource {
@@ -45,7 +46,7 @@ export function parseFontFaces(css: string, baseUrl?: string): ParsedFace[] {
       sources.push({ url, format: s[3]?.toLowerCase() ?? formatFromUrl(url) });
     }
     out.push({
-      family: unquote(family),
+      family: cleanCssName(unquote(family)),
       style: (decls.get('font-style') ?? 'normal').split(/\s+/)[0],
       weight: decls.get('font-weight') ?? '400',
       stretch: decls.get('font-stretch') ?? null,

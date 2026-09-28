@@ -1,4 +1,5 @@
 import type { schema } from './db';
+import { cssQuote } from './css-names';
 import googleCatalog from '@/data/google-fonts.json';
 
 type Family = typeof schema.families.$inferSelect;
@@ -129,7 +130,7 @@ const distance = (f: Pick<Face, 'weightMin' | 'weightMax'>, w: number) => (w < f
 /* CSS generation (DLV-2, VAR-5, DLV-9)                               */
 /* ------------------------------------------------------------------ */
 
-const quote = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+const quote = cssQuote;
 
 // Declare latin last: for overlapping unicode ranges the last matching rule wins.
 const SUBSET_ORDER = ['latin', 'latin-ext', 'vietnamese', 'greek', 'greek-ext', 'cyrillic', 'cyrillic-ext'];
