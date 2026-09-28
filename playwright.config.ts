@@ -28,6 +28,8 @@ export default defineConfig({
     env: {
       DATABASE_URL: process.env.DATABASE_URL ?? '',
       AUTH_SECRET: process.env.AUTH_SECRET ?? 'e2e-secret-that-is-long-enough-for-tests-0123456789',
+      // Reset links are only built from the configured address in production.
+      NEXT_PUBLIC_APP_URL: `http://localhost:${PORT}`,
       // Lets the reset-password test read the link without email.
       EXPOSE_RESET_LINKS: 'true',
       // Keep rate limits from interfering with repeated test runs.

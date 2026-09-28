@@ -1,12 +1,12 @@
 ---
 title: Privacy
 description: What data Typeface Hub collects and how it is used.
-updated: 26 September 2026
+updated: 28 September 2026
 ---
 
 # Privacy policy
 
-> **Important** This page describes how the software handles data. If you operate a public Typeface Hub service, have it reviewed by a lawyer and add your organisation's name and contact details before publishing.
+This service is run by {{operator}}. Questions about your data: {{contact}}.
 
 ## What we collect
 
@@ -36,7 +36,7 @@ We set one cookie, `th_session`, to keep you signed in. It is HTTP-only and expi
 
 - Delete fonts and families at any time; Admins can delete families completely.
 - Revoke API keys at any time.
-- To delete your account, contact the service operator.
+- To delete your account or get a copy of your data, contact us at {{contact}}.
 
 ## Changes
 

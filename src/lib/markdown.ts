@@ -61,6 +61,17 @@ export function renderMarkdown(source: string) {
   return { html, headings };
 }
 
+/**
+ * Legal and about pages name whoever runs the service: {{operator}} and {{contact}}
+ * come from OPERATOR_NAME and CONTACT_EMAIL, so a deployment doesn't need to edit Markdown.
+ */
+function withOperator(md: string) {
+  const operator = process.env.OPERATOR_NAME?.trim() || 'the team that runs this site';
+  const email = process.env.CONTACT_EMAIL?.trim();
+  const contact = email ? `[${email}](mailto:${email})` : '[GitHub](https://github.com/developerr-ayush/Typeface-Hub/issues)';
+  return md.replaceAll('{{operator}}', operator).replaceAll('{{contact}}', contact);
+}
+
 /** Read a Markdown file from src/content with optional front matter (title, description). */
 export async function loadContent(path: string) {
   const raw = await readFile(join(process.cwd(), 'src', 'content', path), 'utf8');
@@ -70,6 +81,6 @@ export async function loadContent(path: string) {
     const i = line.indexOf(':');
     if (i > 0) meta[line.slice(0, i).trim()] = line.slice(i + 1).trim();
   }
-  const body = fm ? raw.slice(fm[0].length) : raw;
+  const body = withOperator(fm ? raw.slice(fm[0].length) : raw);
   return { meta: meta as { title?: string; description?: string; updated?: string }, ...renderMarkdown(body) };
 }

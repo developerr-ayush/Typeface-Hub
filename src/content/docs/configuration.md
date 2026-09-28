@@ -16,7 +16,9 @@ Typeface Hub is configured with environment variables. Locally, put them in `.en
 | `RESEND_API_KEY`, `EMAIL_FROM` | No | Send password-reset emails with [Resend](https://resend.com). `EMAIL_FROM` is the sender, e.g. `Typeface Hub <fonts@example.com>`. Without them, reset links are written to the server log. |
 | `INSECURE_COOKIES` | No | Set to `true` only if you serve the app over plain HTTP on a non-localhost address (for example a LAN IP), so the session cookie works without HTTPS. |
 | `GOOGLE_FONTS_API_KEY` | No | Use the live Google Fonts Developer API. Without it, the bundled catalogue is used. |
-| `NEXT_PUBLIC_APP_URL` | No | Public base URL used in generated CSS and SDUI links, for example a custom font domain. Defaults to the request host. |
+| `NEXT_PUBLIC_APP_URL` | Recommended | Public base URL, for example `https://fonts.example.com`. Used for password-reset links, generated CSS and SDUI links, the sitemap and social previews. On Vercel it defaults to the project's production domain. When self-hosting, set it: in production, reset emails are only sent when the site's address is configured. |
+| `OPERATOR_NAME` | Recommended | Who runs the service (for example your company name). Shown in the Privacy and Terms pages and the footer. |
+| `CONTACT_EMAIL` | Recommended | Support and privacy contact. Shown in the Privacy and Terms pages and as **Contact** in the footer. Without it, those pages link to GitHub issues. |
 
 ## Docker Compose
 
@@ -28,7 +30,13 @@ RESEND_API_KEY=…                # optional, for reset emails
 EMAIL_FROM=Typeface Hub <fonts@example.com>
 GOOGLE_FONTS_API_KEY=…
 APP_URL=http://localhost:3000   # becomes NEXT_PUBLIC_APP_URL
+OPERATOR_NAME=Acme Studio
+CONTACT_EMAIL=hello@example.com
 ```
+
+## Health check
+
+`GET /api/health` returns `{"ok": true, "database": "up"}` with status 200 when the app can reach its database, and 503 otherwise. Point an uptime monitor at it.
 
 ## Database migrations
 

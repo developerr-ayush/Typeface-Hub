@@ -21,3 +21,22 @@ test('the free converter inspects, previews and converts a font', async ({ page 
   expect(download.suggestedFilename()).toBe('bakbak-one-webfont-kit.zip');
   await expect(page.getByText('Your kit is downloading')).toBeVisible();
 });
+
+test('launch essentials: health, robots, sitemap, headers and 404', async ({ page, request }) => {
+  const health = await request.get('/api/health');
+  expect(health.status()).toBe(200);
+  expect(await health.json()).toMatchObject({ ok: true, database: 'up' });
+
+  expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /w/');
+  const sitemap = await (await request.get('/sitemap.xml')).text();
+  expect(sitemap).toContain('/icons</loc>');
+  expect(sitemap).toContain('/docs/icon-fonts</loc>');
+
+  const home = await request.get('/');
+  expect(home.headers()['x-frame-options']).toBe('SAMEORIGIN');
+  expect(home.headers()['strict-transport-security']).toContain('max-age=');
+
+  const res = await page.goto('/this-page-does-not-exist');
+  expect(res?.status()).toBe(404);
+  await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
+});

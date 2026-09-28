@@ -7,6 +7,20 @@ description: What's new in Typeface Hub.
 
 ## September 2026
 
+### Ready for launch
+
+- Security fixes:
+  - Stylesheet imports can no longer be redirected to internal addresses.
+  - Upload references are strictly checked.
+  - Password-reset links only use the configured site address.
+  - Delivery API keys only reach the SDUI endpoint and tokens.
+  - Family names are escaped in all generated CSS.
+- A sitemap, robots.txt, social preview tags and stricter security headers (HSTS, frame protection).
+- `GET /api/health` for uptime monitors.
+- New 404 and error pages, and a loading state in workspaces.
+- Privacy and Terms show who runs the service (`OPERATOR_NAME`, `CONTACT_EMAIL`), with a **Contact** link in the footer.
+- A launch checklist in the [Vercel deployment guide](/docs/deploy-vercel#launch-checklist).
+
 ### Icon fonts
 
 - A new icon font generator at [/icons](/icons), free and without an account: pick from more than 11,000 icons in 16 open-source sets (Font Awesome, Material Design Icons, Bootstrap Icons, Entypo, Typicons and more) or upload your own SVGs.

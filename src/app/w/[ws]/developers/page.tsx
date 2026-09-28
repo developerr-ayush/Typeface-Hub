@@ -31,6 +31,11 @@ const endpoints: [string, string, string][] = [
   ['GET', '/fonts/{workspace}/css', 'Public CSS API (Google CSS2 syntax)'],
   ['GET', '/fonts/{workspace}/tokens.css', 'Public token stylesheet (theme)'],
   ['GET', '/fonts/files/{name}', 'Immutable, content-hashed font files'],
+  ['GET / POST', '/api/v1/icon-fonts', 'List icon fonts or create one from a config'],
+  ['GET / PUT / DELETE', '/api/v1/icon-fonts/{id}', 'Read, replace the config of, or delete an icon font'],
+  ['POST', '/api/v1/icon-fonts/{id}/publish', 'Build and serve an icon font'],
+  ['GET', '/api/v1/icon-fonts/{id}/kit', 'Download an icon font kit (ZIP)'],
+  ['GET', '/fonts/{workspace}/icons/{slug}.css', 'Public stylesheet of a published icon font'],
 ];
 
 export default async function DevelopersPage({ params }: { params: Promise<{ ws: string }> }) {

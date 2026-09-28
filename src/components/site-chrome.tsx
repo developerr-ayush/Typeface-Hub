@@ -63,6 +63,8 @@ const footer = [
 ];
 
 export function SiteFooter() {
+  const contact = process.env.CONTACT_EMAIL?.trim();
+  const columns = contact ? footer.map((c) => (c.title === 'Company' ? { ...c, links: [...c.links, ['Contact', `mailto:${contact}`]] } : c)) : footer;
   return (
     <footer className="border-t border-line bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_repeat(3,1fr)]">
@@ -70,7 +72,7 @@ export function SiteFooter() {
           <Logo />
           <p className="mt-3 max-w-xs text-sm text-muted">Font management and delivery: add a font once, ship only what each page renders.</p>
         </div>
-        {footer.map((col) => (
+        {columns.map((col) => (
           <div key={col.title}>
             <h2 className="text-sm font-semibold text-ink">{col.title}</h2>
             <ul className="mt-3 space-y-2 text-sm">
@@ -87,7 +89,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-5 text-xs text-muted sm:px-6">
-          <span>© {new Date().getFullYear()} Typeface Hub</span>
+          <span>© {new Date().getFullYear()} {process.env.OPERATOR_NAME?.trim() || 'Typeface Hub'}</span>
           <span>Fonts are the property of their designers and foundries. Check each licence before using a font.</span>
         </div>
       </div>

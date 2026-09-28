@@ -43,6 +43,20 @@ Deploy the project. The build runs database migrations before `next build`, so t
 
 Open the site and create an account.
 
+## Launch checklist
+
+Before you share the link:
+
+- [ ] `AUTH_SECRET` is set to a long random value.
+- [ ] A private Blob store is connected (`BLOB_PRIVATE_READ_WRITE_TOKEN`); **Settings** in the app shows no storage warning.
+- [ ] `NEXT_PUBLIC_APP_URL` is your final domain, and the domain is added under **Settings → Domains**.
+- [ ] `RESEND_API_KEY` and `EMAIL_FROM` are set, your sending domain is verified in Resend, and **Forgot password** delivers an email.
+- [ ] `OPERATOR_NAME` and `CONTACT_EMAIL` are set, and you've read the [Privacy](/privacy) and [Terms](/terms) pages (have them reviewed if you run a commercial service).
+- [ ] Upload a font, publish it and load its CSS link from another site.
+- [ ] Try [/convert](/convert) and [/icons](/icons) signed out.
+- [ ] An uptime monitor checks `https://your-domain/api/health`.
+- [ ] Search engines can read `https://your-domain/sitemap.xml` (submit it in Google Search Console).
+
 ## Recommended for production
 
 - **A custom domain**, for example `fonts.example.com`, so font URLs stay stable if you move hosting. Set `NEXT_PUBLIC_APP_URL` to it.

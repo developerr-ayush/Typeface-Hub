@@ -134,7 +134,7 @@ export default async function Home() {
         <section className="bg-canvas">
           <div className="mx-auto grid max-w-6xl gap-6 px-4 py-20 sm:px-6 md:grid-cols-2">
             <div className="rounded-2xl border border-line bg-surface p-8">
-              <h2 className="text-xl font-semibold text-ink">Just need files?</h2>
+              <h2 className="text-xl font-semibold text-ink">Free tools, no account</h2>
               <p className="mt-2 text-sm leading-relaxed text-muted">
                 The free converter turns any font into a web font kit: WOFF2, WOFF and TTF files, a ready-made stylesheet and a demo page with the CSS for every combination. No account, and files aren&apos;t kept.
               </p>

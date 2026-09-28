@@ -63,6 +63,19 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
       <Button type="submit" variant="primary" className="w-full" loading={loading}>
         {mode === 'login' ? 'Sign in' : 'Create account'}
       </Button>
+      {mode === 'signup' && (
+        <p className="text-center text-xs text-muted">
+          By creating an account you agree to the{' '}
+          <Link href="/terms" className="underline hover:text-ink">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="underline hover:text-ink">
+            Privacy policy
+          </Link>
+          .
+        </p>
+      )}
       <p className="text-center text-sm text-muted">
         {mode === 'login' ? (
           <>

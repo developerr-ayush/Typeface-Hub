@@ -1,12 +1,12 @@
 ---
 title: Terms
 description: Terms of use for Typeface Hub.
-updated: 26 September 2026
+updated: 28 September 2026
 ---
 
 # Terms of use
 
-> **Important** These are starter terms. If you operate a public Typeface Hub service, have them reviewed by a lawyer and add your organisation's details before publishing.
+These terms cover your use of this Typeface Hub service, run by {{operator}}.
 
 ## Using the service
 
@@ -42,4 +42,4 @@ The service is provided "as is", without warranties. To the extent the law allow
 
 ## Contact
 
-Questions about these terms: open an issue on [GitHub](https://github.com/developerr-ayush/Typeface-Hub) or contact the service operator.
+Questions about these terms: {{contact}}.

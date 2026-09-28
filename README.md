@@ -38,7 +38,12 @@ Optional environment variables:
 | Variable | Purpose |
 | --- | --- |
 | `GOOGLE_FONTS_API_KEY` | Use the live Google Fonts Developer API. Without it, the bundled catalogue (`src/data/google-fonts.json`, ~1,900 families) is used. Refresh it with `npm run catalog:build`. |
-| `NEXT_PUBLIC_APP_URL` | Public base URL for absolute links in generated CSS and SDUI (for example a custom font domain). Defaults to the request host. |
+| `NEXT_PUBLIC_APP_URL` | Public base URL (for example a custom font domain), used for reset links, generated CSS, SDUI, the sitemap and social previews. Defaults to the Vercel production domain. |
+| `OPERATOR_NAME`, `CONTACT_EMAIL` | Who runs the service and how to reach them; shown in Privacy, Terms and the footer. |
+| `BLOB_PRIVATE_READ_WRITE_TOKEN` | A second, private Blob store for original font files and cached kits (recommended). |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Send password-reset emails with Resend. |
+
+Before launch, go through the checklist in `/docs/deploy-vercel#launch-checklist`. Uptime monitors can use `GET /api/health`.
 
 Font processing runs in the background after the request (`after()`), with `maxDuration` of 300 s on processing routes. Large uploads go straight from the browser to Vercel Blob, so the 4.5 MB request limit doesn't apply.
 
